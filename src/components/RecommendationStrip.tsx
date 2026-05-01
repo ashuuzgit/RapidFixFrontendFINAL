@@ -13,7 +13,7 @@ export function RecommendationStrip() {
   ];
 
   return (
-    <div className="w-full bg-white overflow-hidden py-12 md:py-20 relative flex items-center justify-center">
+    <div className="w-full bg-white overflow-hidden py-12 md:py-20 relative z-20 flex items-center justify-center">
       {/* The rotated container */}
       <div 
         className="w-[110%] absolute left-1/2 -translate-x-1/2 bg-[#96250C] transform -rotate-2 py-4 shadow-xl flex z-10"

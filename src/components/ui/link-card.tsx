@@ -27,8 +27,14 @@ const LinkCard = React.forwardRef<HTMLAnchorElement, LinkCardProps>(
     };
 
     return (
-      <Link href={href} passHref legacyBehavior>
-        <motion.a
+      <motion.div
+        variants={cardVariants}
+        initial="initial"
+        whileHover="hover"
+        className="w-full h-full flex"
+      >
+        <Link
+          href={href}
           ref={ref}
           className={cn(
             'group relative flex h-72 md:h-80 w-full min-w-[280px] flex-col justify-between overflow-hidden',
@@ -36,9 +42,6 @@ const LinkCard = React.forwardRef<HTMLAnchorElement, LinkCardProps>(
             'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]',
             className
           )}
-          variants={cardVariants}
-          initial="initial"
-          whileHover="hover"
           aria-label={`Link to ${title}`}
           {...props}
         >
@@ -68,8 +71,8 @@ const LinkCard = React.forwardRef<HTMLAnchorElement, LinkCardProps>(
               />
             ) : null}
           </div>
-        </motion.a>
-      </Link>
+        </Link>
+      </motion.div>
     );
   }
 );

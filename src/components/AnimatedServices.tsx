@@ -78,10 +78,9 @@ export function AnimatedServices() {
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger: containerRef.current,
-        start: "top 15%", // Pins when the section is 15% from the top
-        end: "+=100%", // The animation takes 100vh of scrolling to complete
-        scrub: 2, // Smooth, slow lag behind the scroll
-        pin: true, // Pins the section so the user must scroll through the animation
+        start: "top 60%", // Starts when section is 40% into view
+        end: "top 0%",   // Ends when section top hits top of viewport
+        scrub: 2, // Smooth, slow lag behind the scroll (2 seconds) ensures it feels slow even if scrolled fast
       }
     })
 
@@ -96,11 +95,10 @@ export function AnimatedServices() {
       },
       y: (index, target) => {
         if (!containerRef.current) return 0
-        const containerRect = containerRef.current.getBoundingClientRect()
         const targetRect = target.getBoundingClientRect()
-        
-        // Start the bundle lower since the section is now pinned higher up
-        const bundleY = containerRect.top + window.innerHeight * 0.7
+        const containerRect = containerRef.current.getBoundingClientRect()
+        // Bundle them vertically at a fixed point below the container
+        const bundleY = containerRect.top + containerRect.height / 2 + window.innerHeight * 0.6
         const targetCenterY = targetRect.top + targetRect.height / 2
         return bundleY - targetCenterY
       },
@@ -113,12 +111,12 @@ export function AnimatedServices() {
   }, { scope: containerRef })
 
   return (
-    <section ref={containerRef} className="border-b-2 border-[var(--color-black)] relative z-10 bg-[var(--color-grey-100)] py-16 md:py-24 overflow-hidden">
+    <section ref={containerRef} className="w-full border-b-2 border-[var(--color-black)] relative z-10 bg-[var(--color-grey-100)] py-16 md:py-24 overflow-hidden">
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[12vw] font-black opacity-5 uppercase tracking-tighter whitespace-nowrap z-[-1] pointer-events-none text-black">
         OUR SERVICES
       </div>
       
-      <div className="container mx-auto px-4 md:px-8">
+      <div className="container mx-auto px-4 md:px-8 relative z-10">
         <div className="flex flex-col md:flex-row justify-between items-center mb-12">
           <h2 className="text-4xl md:text-5xl font-black uppercase tracking-tight text-[var(--color-black)] mb-6 md:mb-0">
             Explore Our Services

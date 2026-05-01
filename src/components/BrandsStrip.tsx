@@ -6,22 +6,22 @@ export function BrandsStrip() {
   // Using standard <img> to bypass Next.js image optimization issues with SVGs.
   const brands = [
     { name: "Tata", logo: "https://upload.wikimedia.org/wikipedia/commons/8/8e/Tata_logo.svg" },
-    { name: "Mahindra", logo: "https://upload.wikimedia.org/wikipedia/commons/c/c5/Mahindra_Auto.svg" },
-    { name: "Hero", logo: "https://upload.wikimedia.org/wikipedia/commons/d/de/Hero_MotoCorp.svg" },
+    { name: "Mahindra", logo: "/brandLogos/mahindra.webp" },
+    { name: "Hero", logo: "/brandLogos/hero.webp" },
     { name: "Honda", logo: "https://upload.wikimedia.org/wikipedia/commons/7/7b/Honda_Logo.svg" },
-    { name: "Suzuki", logo: "https://upload.wikimedia.org/wikipedia/commons/1/12/Suzuki_logo_2.svg" },
+    { name: "Suzuki", logo: "/brandLogos/suzuki.webp" },
     { name: "Hyundai", logo: "https://upload.wikimedia.org/wikipedia/commons/4/44/Hyundai_Motor_Company_logo.svg" },
-    { name: "Renault", logo: "https://upload.wikimedia.org/wikipedia/commons/4/49/Renault_2021.svg" },
-    { name: "Jawa", logo: "https://upload.wikimedia.org/wikipedia/commons/2/23/Jawa_Motors_Logo.svg" },
-    { name: "Harley Davidson", logo: "https://upload.wikimedia.org/wikipedia/commons/d/d1/Harley-Davidson_logo.svg" },
+    { name: "Jawa", logo: "/brandLogos/java.webp" },
+    { name: "Harley Davidson", logo: "/brandLogos/harley.webp" },
     { name: "Volkswagen", logo: "https://upload.wikimedia.org/wikipedia/commons/a/a1/Volkswagen_Logo_till_1995.svg" },
     { name: "Audi", logo: "https://upload.wikimedia.org/wikipedia/commons/9/92/Audi-Logo_2016.svg" },
     { name: "BMW", logo: "https://upload.wikimedia.org/wikipedia/commons/f/f4/BMW_logo_%28gray%29.svg" },
-    { name: "TVS", logo: "https://upload.wikimedia.org/wikipedia/commons/4/4e/TVS_Motor_Company_Logo.svg" },
-    { name: "Skoda", logo: "brandLogos/skoda.webp" },
-    { name: "KIA", logo: "https://upload.wikimedia.org/wikipedia/commons/4/4f/Kia_logo.svg" },
+    { name: "TVS", logo: "/brandLogos/tvs.webp" },
+    { name: "Skoda", logo: "/brandLogos/skoda.webp" },
+    { name: "KIA", logo: "/brandLogos/kia.webp"},
     { name: "Mercedes", logo: "https://upload.wikimedia.org/wikipedia/commons/9/90/Mercedes-Logo.svg" },
-  ];
+    { name: "Bajaj", logo: "/brandLogos/bajaj.webp"}
+    ];
 
   const observerRef = useRef<IntersectionObserver | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -55,7 +55,7 @@ export function BrandsStrip() {
   const displayBrands = [...brands, ...brands, ...brands, ...brands];
 
   return (
-    <section className="border-b-2 border-black bg-white overflow-hidden py-16">
+    <section className="border-b-2 border-black bg-white overflow-hidden py-16 relative z-20">
       <div className="text-center mb-10">
         <h2 className="text-3xl font-black uppercase tracking-tight">Brands We Serve</h2>
         <p className="text-muted-foreground mt-2 font-medium">Precision engineering for all major manufacturers.</p>
