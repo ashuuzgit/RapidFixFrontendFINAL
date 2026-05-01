@@ -1,8 +1,10 @@
 "use client"
 
 import { useRef } from "react"
-import Link from "next/link"
-import { ArrowRight, Settings, Battery, Wrench, Zap } from "lucide-react"
+import { useRouter } from "next/navigation"
+import { ArrowRight } from "lucide-react"
+import { LinkCard } from "@/components/ui/link-card"
+import { Button } from "@/components/ui/Button"
 import gsap from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
 import { useGSAP } from "@gsap/react"
@@ -10,91 +12,161 @@ import { useGSAP } from "@gsap/react"
 gsap.registerPlugin(ScrollTrigger)
 
 const SERVICES = [
-  { 
-    id: "full_system_restoration",
-    title: "FULL SYSTEM RESTORATION", 
-    icon: <Settings className="w-8 h-8" />, 
-    desc: "End-to-end computational diagnostics and physical restoration utilizing proprietary performance protocols.",
-    action: "VIEW LAB SPECIFICATIONS"
+  {
+    id: "bike_service",
+    title: "Bike Service",
+    emoji: "🏍️",
+    description: "Regular maintenance, oil change, tune-up",
   },
-  { 
-    id: "energy_systems",
-    title: "ENERGY SYSTEMS", 
-    icon: <Battery className="w-8 h-8" />, 
-    desc: "Cell-level analysis and voltage optimization for next-generation propulsion systems.",
-    action: "STATUS: OPERATIONAL"
+  {
+    id: "car_service",
+    title: "Car Service",
+    emoji: "🚗",
+    description: "Periodic service, engine care, inspections",
   },
-  { 
-    id: "bespoke_integration",
-    title: "BESPOKE INTEGRATION", 
-    icon: <Wrench className="w-8 h-8" />, 
-    desc: "Custom-machined components installed with aerospace tolerances for ultimate reliability.",
-    action: "INITIATE SEQUENCE"
+  {
+    id: "car_ac_repair",
+    title: "Car AC Repair",
+    emoji: "❄️",
+    description: "Car AC gas refill, compressor, cooling fix",
   },
-  { 
-    id: "thermal_dynamics",
-    title: "THERMAL DYNAMICS", 
-    icon: <Zap className="w-8 h-8" />, 
-    desc: "Advanced cooling management and heat dissipation tuning for extreme conditions.",
-    action: "EXPLORE MATRIX"
-  }
+  {
+    id: "battery",
+    title: "Battery",
+    emoji: "🔋",
+    description: "Jump start, replacement, testing",
+  },
+  {
+    id: "tyre_wheel",
+    title: "Tyre & Wheel",
+    emoji: "🛞",
+    description: "Puncture, replacement, alignment",
+  },
+  {
+    id: "engine_repair",
+    title: "Engine Repair",
+    emoji: "🔧",
+    description: "Diagnostics, overhaul, performance",
+  },
+  {
+    id: "denting_painting",
+    title: "Denting & Painting",
+    emoji: "🎨",
+    description: "Scratch removal, body work, polish",
+  },
+  {
+    id: "ev_service",
+    title: "EV Service",
+    emoji: "⚡",
+    description: "Electric bike & scooter service from ₹999",
+  },
 ]
 
 export function AnimatedServices() {
-  const containerRef = useRef<HTMLDivElement>(null)
+  const router = useRouter()
+  const containerRef = useRef<HTMLElement>(null)
 
   useGSAP(() => {
-    const cards = gsap.utils.toArray('.service-card')
-    
-    gsap.from(cards, {
+    const cards = gsap.utils.toArray<HTMLElement>('.service-card')
+    if (!cards.length) return
+
+    // Set initial z-indexes so the first card is on top
+    cards.forEach((card, i) => {
+      gsap.set(card, { zIndex: cards.length - i })
+    })
+
+    const tl = gsap.timeline({
       scrollTrigger: {
         trigger: containerRef.current,
-        start: "top 80%",
-        toggleActions: "play none none reverse"
+        start: "top 15%", // Pins when the section is 15% from the top
+        end: "+=100%", // The animation takes 100vh of scrolling to complete
+        scrub: 2, // Smooth, slow lag behind the scroll
+        pin: true, // Pins the section so the user must scroll through the animation
+      }
+    })
+
+    tl.from(cards, {
+      x: (index, target) => {
+        if (!containerRef.current) return 0
+        const containerRect = containerRef.current.getBoundingClientRect()
+        const targetRect = target.getBoundingClientRect()
+        const bundleX = containerRect.left + containerRect.width / 2
+        const targetCenterX = targetRect.left + targetRect.width / 2
+        return bundleX - targetCenterX
       },
-      y: 100,
+      y: (index, target) => {
+        if (!containerRef.current) return 0
+        const containerRect = containerRef.current.getBoundingClientRect()
+        const targetRect = target.getBoundingClientRect()
+        
+        // Start the bundle lower since the section is now pinned higher up
+        const bundleY = containerRect.top + window.innerHeight * 0.7
+        const targetCenterY = targetRect.top + targetRect.height / 2
+        return bundleY - targetCenterY
+      },
+      rotation: (index) => (index % 2 === 0 ? 1 : -1) * (index * 3),
+      scale: 0.6,
       opacity: 0,
-      duration: 0.8,
-      stagger: 0.2,
-      ease: "power3.out"
+      stagger: 0.01,
+      ease: "power3.out",
     })
   }, { scope: containerRef })
 
   return (
-    <section ref={containerRef} className="border-b-2 border-black relative z-10 bg-white">
+    <section ref={containerRef} className="border-b-2 border-[var(--color-black)] relative z-10 bg-[var(--color-grey-100)] py-16 md:py-24 overflow-hidden">
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[12vw] font-black opacity-5 uppercase tracking-tighter whitespace-nowrap z-[-1] pointer-events-none text-black">
-        CARE & SERVICE
+        OUR SERVICES
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 divide-y-2 md:divide-y-0 md:divide-x-2 divide-black">
-        {SERVICES.map((service, idx) => {
-          const isBlackStart = idx === 2 || idx === 3;
-          const baseClass = isBlackStart ? "bg-black text-white" : "bg-white text-black";
-          const hoverClass = isBlackStart ? "hover:bg-white hover:text-black" : "hover:bg-black hover:text-white";
+      
+      <div className="container mx-auto px-4 md:px-8">
+        <div className="flex flex-col md:flex-row justify-between items-center mb-12">
+          <h2 className="text-4xl md:text-5xl font-black uppercase tracking-tight text-[var(--color-black)] mb-6 md:mb-0">
+            Explore Our Services
+          </h2>
+          <Button 
+            className="hidden md:flex group" 
+            onClick={() => router.push('/booking')}
+            variant="outline"
+          >
+            VIEW ALL <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+          </Button>
+        </div>
 
-          return (
-            <Link 
-              key={idx} 
-              href={{ pathname: "/booking", query: { service: service.id } }}
-              className={`service-card m-4 p-8 md:p-16 flex flex-col justify-between transition-all duration-500 hover:scale-[1.03] group cursor-pointer border-2 border-black ${baseClass} ${hoverClass}`}
+        {/* Desktop Grid & Mobile Horizontal Scroll */}
+        <div className="flex md:grid overflow-x-auto md:overflow-visible gap-4 md:gap-6 pb-8 md:pb-0 snap-x snap-mandatory hide-scrollbar md:grid-cols-2 lg:grid-cols-4">
+          {SERVICES.map((service, idx) => (
+            <div key={idx} className="service-card snap-center shrink-0 w-[85vw] md:w-auto relative">
+              <LinkCard
+                emoji={service.emoji}
+                title={service.title}
+                description={service.description}
+                href={`/booking?service=${service.id}`}
+              />
+            </div>
+          ))}
+          
+          {/* Mobile "View All" Button at the end of scroll */}
+          <div className="md:hidden snap-center shrink-0 w-[85vw] flex items-center justify-center p-4">
+            <Button 
+              className="w-full h-full min-h-[200px] border-2 border-[var(--color-black)] bg-white text-[var(--color-black)] hover:bg-[var(--color-primary)] hover:text-white hover:border-[var(--color-primary)] transition-colors text-xl font-black group"
+              onClick={() => router.push('/booking')}
             >
-              <div>
-                <div className="mb-12 text-[var(--color-primary)]">
-                  {service.icon}
-                </div>
-                <h3 className="text-3xl md:text-4xl font-black uppercase tracking-tight mb-6">
-                  {service.title}
-                </h3>
-                <p className="opacity-70 font-medium max-w-sm text-lg leading-relaxed mb-16">
-                  {service.desc}
-                </p>
-              </div>
-              <div className="flex items-center gap-4 text-[var(--color-primary)] font-black tracking-widest text-xs uppercase mt-auto">
-                {service.action} <ArrowRight className="w-4 h-4 group-hover:translate-x-2 transition-transform" />
-              </div>
-            </Link>
-          )
-        })}
+              VIEW ALL SERVICES <ArrowRight className="ml-2 w-6 h-6 group-hover:translate-x-2 transition-transform" />
+            </Button>
+          </div>
+        </div>
       </div>
+
+      <style dangerouslySetInnerHTML={{__html: `
+        .hide-scrollbar::-webkit-scrollbar {
+          display: none;
+        }
+        .hide-scrollbar {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+      `}} />
     </section>
   )
 }
+

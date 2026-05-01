@@ -26,10 +26,14 @@ export function Footer() {
         <div>
           <h4 className="font-bold mb-4">SERVICES</h4>
           <ul className="space-y-2 text-sm text-[var(--color-grey-300)]">
-            <li>Routine Maintenance</li>
-            <li>Engine Diagnostics</li>
-            <li>Performance Tuning</li>
-            <li>Transmission Rebuild</li>
+            <li>Bike Service</li>
+            <li>Car Service</li>
+            <li>Car AC Repair</li>
+            <li>Battery</li>
+            <li>Tyre & Wheel</li>
+            <li>Engine Repair</li>
+            <li>Denting & Painting</li>
+            <li>EV Service</li>
           </ul>
         </div>
         <div>

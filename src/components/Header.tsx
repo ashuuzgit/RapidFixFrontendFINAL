@@ -10,12 +10,14 @@ export function Header() {
   const [isServicesOpen, setIsServicesOpen] = useState(false)
 
   const services = [
+    { name: "BIKE SERVICE", href: { pathname: "/booking", query: { service: "bike_service" } } },
+    { name: "CAR SERVICE", href: { pathname: "/booking", query: { service: "car_service" } } },
+    { name: "CAR AC REPAIR", href: { pathname: "/booking", query: { service: "car_ac_repair" } } },
+    { name: "BATTERY", href: { pathname: "/booking", query: { service: "battery" } } },
+    { name: "TYRE & WHEEL", href: { pathname: "/booking", query: { service: "tyre_wheel" } } },
     { name: "ENGINE REPAIR", href: { pathname: "/booking", query: { service: "engine_repair" } } },
-    { name: "CAR TYRE REPAIR", href: { pathname: "/booking", query: { service: "tyre_repair" } } },
-    { name: "OIL CHANGE", href: { pathname: "/booking", query: { service: "oil_change" } } },
-    { name: "BODY WORKS", href: { pathname: "/booking", query: { service: "body_works" } } },
-    { name: "CAR CLEANING", href: { pathname: "/booking", query: { service: "car_cleaning" } } },
-    { name: "BATTERY REPAIR", href: { pathname: "/booking", query: { service: "battery_repair" } } },
+    { name: "DENTING & PAINTING", href: { pathname: "/booking", query: { service: "denting_painting" } } },
+    { name: "EV SERVICE", href: { pathname: "/booking", query: { service: "ev_service" } } },
   ]
 
   return (
