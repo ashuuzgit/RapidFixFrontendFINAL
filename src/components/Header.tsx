@@ -22,7 +22,7 @@ export function Header() {
     <header className="sticky top-0 z-50 w-full border-b border-[var(--color-grey-200)] bg-[var(--color-white)]">
       <div className="container mx-auto px-8 h-20 flex items-center justify-between relative">
         <Link href="/" className="text-2xl font-bold tracking-tight z-50 relative flex items-center gap-3">
-          <Image src="/logo.png" alt="RapidFix Logo" width={80} height={80} className="object-contain max-h-16" />
+          <Image src="/logo.png" alt="RapidFix Logo" width={100} height={100} className="object-contain max-h-16" />
           <span>RAPID<span className="text-[var(--color-primary)]">FIX</span></span>
         </Link>
         <nav className="hidden md:flex items-center gap-8 text-sm font-bold tracking-wider relative z-50">

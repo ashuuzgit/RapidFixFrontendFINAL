@@ -8,6 +8,7 @@ import { RecommendationStrip } from "@/components/RecommendationStrip"
 import { BrandsStrip } from "@/components/BrandsStrip"
 import { AnimatedTestimonials } from "@/components/AnimatedTestimonials"
 import { StatisticsStrip } from "@/components/StatisticsStrip"
+import { ServiceFlow } from "@/components/ServiceFlow"
 
 export default function Home() {
   return (
@@ -80,6 +81,9 @@ export default function Home() {
 
       {/* Testimonials Section (Animated) */}
       <AnimatedTestimonials />
+
+      {/* Service Flow Section */}
+      <ServiceFlow />
 
       {/* Statistics Section */}
       <StatisticsStrip />
