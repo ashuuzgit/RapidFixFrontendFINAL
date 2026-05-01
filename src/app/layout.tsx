@@ -7,6 +7,7 @@ import { LocateUs } from "@/components/LocateUs";
 import { StickyWhatsApp } from "@/components/StickyWhatsApp";
 import { LeadPopup } from "@/components/LeadPopup";
 import { GsapScrollWrapper } from "@/components/GsapScrollWrapper";
+import { FAQSection } from "@/components/FAQSection";
 
 const spaceGrotesk = Space_Grotesk({
   variable: "--font-sans",
@@ -32,6 +33,7 @@ export default function RootLayout({
         <Header />
         <GsapScrollWrapper>
           <main className="flex-1">{children}</main>
+          <FAQSection />
           <LocateUs />
           <Footer />
         </GsapScrollWrapper>

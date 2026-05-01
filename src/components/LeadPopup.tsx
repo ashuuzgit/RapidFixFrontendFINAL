@@ -57,13 +57,13 @@ export function LeadPopup() {
 
           <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); /* Handle submission */ setIsOpen(false); }}>
             <div className="flex relative">
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 font-semibold text-zinc-900 dark:text-zinc-100">
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 font-semibold text-zinc-900 dark:text-zinc-100 pointer-events-none">
                 +91
               </span>
               <input 
                 type="tel" 
                 placeholder="Phone Number" 
-                className="w-full h-14 pl-14 pr-4 rounded-xl border-2 border-red-100 focus:border-red-500 outline-none transition-colors dark:bg-zinc-900 dark:border-red-900/30 dark:focus:border-red-500 text-lg"
+                className="w-full h-14 pl-14 pr-4 rounded-xl border-2 border-red-100 focus:border-red-500 outline-none transition-colors dark:bg-zinc-900 dark:border-red-900/30 dark:focus:border-red-500 text-lg text-black dark:text-white"
                 value={phoneNumber}
                 onChange={(e) => setPhoneNumber(e.target.value)}
                 required

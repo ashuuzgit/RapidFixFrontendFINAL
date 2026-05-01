@@ -18,8 +18,8 @@ export function BrandsStrip() {
     { name: "Audi", logo: "https://upload.wikimedia.org/wikipedia/commons/9/92/Audi-Logo_2016.svg" },
     { name: "BMW", logo: "https://upload.wikimedia.org/wikipedia/commons/f/f4/BMW_logo_%28gray%29.svg" },
     { name: "TVS", logo: "https://upload.wikimedia.org/wikipedia/commons/4/4e/TVS_Motor_Company_Logo.svg" },
-    { name: "Skoda", logo: "https://upload.wikimedia.org/wikipedia/commons/e/e0/Skoda_logo.svg" },
-    { name: "KIA", logo: "https://upload.wikimedia.org/wikipedia/commons/6/67/Kia_2021_logo.svg" },
+    { name: "Skoda", logo: "brandLogos/skoda.webp" },
+    { name: "KIA", logo: "https://upload.wikimedia.org/wikipedia/commons/4/4f/Kia_logo.svg" },
     { name: "Mercedes", logo: "https://upload.wikimedia.org/wikipedia/commons/9/90/Mercedes-Logo.svg" },
   ];
 

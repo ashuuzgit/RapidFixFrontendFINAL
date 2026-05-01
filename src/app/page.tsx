@@ -6,6 +6,8 @@ import { AnimatedServices } from "@/components/AnimatedServices"
 import { AnimatedWorkflow } from "@/components/AnimatedWorkflow"
 import { RecommendationStrip } from "@/components/RecommendationStrip"
 import { BrandsStrip } from "@/components/BrandsStrip"
+import { AnimatedTestimonials } from "@/components/AnimatedTestimonials"
+import { StatisticsStrip } from "@/components/StatisticsStrip"
 
 export default function Home() {
   return (
@@ -64,6 +66,9 @@ export default function Home() {
         </div>
       </section>
 
+      {/* The Workflow (GSAP Animated) */}
+      <AnimatedWorkflow />
+
       {/* Services Section (GSAP Animated) */}
       <AnimatedServices />
 
@@ -73,48 +78,11 @@ export default function Home() {
       {/* Brands We Serve (Image 3) */}
       <BrandsStrip />
 
-      {/* Testimonials Section (Image 3) */}
-      <section className="border-b-2 border-black bg-white relative z-10 overflow-hidden">
-        <div className="absolute -bottom-10 right-0 text-[15vw] font-black opacity-[0.03] uppercase tracking-tighter whitespace-nowrap z-[-1] pointer-events-none text-black">
-          TRUST
-        </div>
-        <div className="grid grid-cols-1 lg:grid-cols-2 divide-y-2 lg:divide-y-0 lg:divide-x-2 divide-black">
-          <div className="p-12 md:p-24 flex flex-col justify-between">
-            <div>
-              <p className="text-[var(--color-primary)] font-black tracking-widest text-xs uppercase mb-8">INTELLIGENCE REPORT</p>
-              <h2 className="text-5xl md:text-7xl font-black uppercase tracking-tight leading-none">
-                THE VOICE OF <br />
-                <span className="text-black/20">PRECISION</span>
-              </h2>
-            </div>
-            <div className="flex gap-4 mt-16">
-              <button className="w-14 h-14 border border-black/20 flex items-center justify-center hover:bg-black hover:text-white transition-all hover:scale-110">
-                <ArrowLeft size={24} />
-              </button>
-              <button className="w-14 h-14 bg-black text-white flex items-center justify-center hover:bg-[var(--color-primary)] transition-all hover:scale-110">
-                <ArrowRight size={24} />
-              </button>
-            </div>
-          </div>
-          <div className="p-12 md:p-24 bg-[var(--color-grey-100)]/50 flex flex-col justify-center transition-transform duration-500 hover:scale-[1.03]">
-            <p className="text-2xl md:text-4xl font-bold leading-tight mb-12 tracking-tight">
-              "Kinetic Gallery represents a paradigm shift in automotive care. Their laboratory environment and computational rigor ensure unmatched mechanical integrity."
-            </p>
-            <div className="flex items-center gap-6">
-              <div className="w-16 h-16 bg-black flex items-center justify-center text-white/50">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-              </div>
-              <div>
-                <h4 className="font-black text-sm tracking-widest uppercase">A. STERLING</h4>
-                <p className="text-xs text-black/50 tracking-wider font-bold mt-1">FOUNDING PARTNER, STERLING GLOBAL</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* Testimonials Section (Animated) */}
+      <AnimatedTestimonials />
 
-      {/* The Workflow (GSAP Animated) */}
-      <AnimatedWorkflow />
+      {/* Statistics Section */}
+      <StatisticsStrip />
 
       {/* CTA Section */}
       <section className="border-b-2 border-black bg-[var(--color-grey-100)] py-24 relative z-10 overflow-hidden">
