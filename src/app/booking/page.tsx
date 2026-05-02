@@ -441,7 +441,7 @@ export default function Booking() {
                     <span className="text-3xl font-black text-[var(--color-primary)]">₹{getEstimate()}</span>
                   </div>
                   <p className="text-[10px] text-[var(--color-grey-600)] mt-2 font-bold uppercase text-center">
-                    *Final price may vary after inspection
+                    *Prices may vary with specifications
                   </p>
                 </div>
               </div>

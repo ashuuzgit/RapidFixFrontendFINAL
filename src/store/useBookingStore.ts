@@ -48,23 +48,6 @@ export const useBookingStore = create<BookingState>((set, get) => ({
   }),
   
   getEstimate: () => {
-    let total = 399; // Bare minimum for each service
-    const state = get();
-    
-    // Engine type modifiers
-    if (state.engineType === 'Hybrid') total += 200;
-    if (state.engineType === 'Electric') total += 100;
-
-    // Service type cost
-    if (state.serviceType === 'BIKE SERVICE') total += 100;
-    if (state.serviceType === 'CAR SERVICE') total += 600;
-    if (state.serviceType === 'CAR AC REPAIR') total += 400;
-    if (state.serviceType === 'BATTERY') total += 200;
-    if (state.serviceType === 'TYRE & WHEEL') total += 150;
-    if (state.serviceType === 'ENGINE REPAIR') total += 2500;
-    if (state.serviceType === 'DENTING & PAINTING') total += 1500;
-    if (state.serviceType === 'EV SERVICE') total += 600;
-
-    return total;
+    return 399; // Flat base price
   }
 }))
