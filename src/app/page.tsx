@@ -37,7 +37,7 @@ export default function Home() {
             <Banknote className="w-8 h-8 text-black group-hover:scale-110 transition-transform" />
             <div>
               <h4 className="font-black text-sm md:text-base tracking-widest uppercase">Transparent Pricing</h4>
-              <p className="text-xs text-black/50 tracking-wider font-bold">STARTING AT ₹399</p>
+              <p className="text-xs text-black/50 tracking-wider font-bold">₹399 BOOKING CHARGE</p>
             </div>
           </div>
         </div>

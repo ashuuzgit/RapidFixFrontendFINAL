@@ -437,11 +437,11 @@ export default function Booking() {
 
                 <div className="bg-[var(--color-grey-100)] p-4 rounded-lg mt-6">
                   <div className="flex justify-between items-center">
-                    <span className="text-sm font-black uppercase">Total</span>
+                    <span className="text-sm font-black uppercase">Booking Charge</span>
                     <span className="text-3xl font-black text-[var(--color-primary)]">₹{getEstimate()}</span>
                   </div>
                   <p className="text-[10px] text-[var(--color-grey-600)] mt-2 font-bold uppercase text-center">
-                    *Prices may vary with specifications
+                    *Cost will vary additionally according to parts and work
                   </p>
                 </div>
               </div>
