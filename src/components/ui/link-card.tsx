@@ -1,19 +1,23 @@
-import React from 'react';
-import { motion } from 'framer-motion';
-import { cn } from '@/lib/utils';
-import Link from 'next/link';
+"use client"
 
-interface LinkCardProps extends Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, 'title' | 'href'> {
+import React from 'react';
+import { HTMLMotionProps, motion, Variants } from 'framer-motion';
+import { cn } from '@/lib/utils'; // Assuming you have a utility for class names
+
+// Props interface for type safety and clarity
+interface LinkCardProps extends HTMLMotionProps<"a"> {
   title: string;
   description: string;
   imageUrl?: string;
   emoji?: string;
+  centeredImage?: boolean;
   href: string;
 }
 
 const LinkCard = React.forwardRef<HTMLAnchorElement, LinkCardProps>(
-  ({ className, title, description, imageUrl, emoji, href, ...props }, ref) => {
-    const cardVariants = {
+  ({ className, title, description, imageUrl, emoji, centeredImage, href, ...props }, ref) => {
+    // Animation variants for framer-motion
+    const cardVariants: Variants = {
       initial: { scale: 1, y: 0 },
       hover: {
         scale: 1.03,
@@ -27,52 +31,57 @@ const LinkCard = React.forwardRef<HTMLAnchorElement, LinkCardProps>(
     };
 
     return (
-      <motion.div
+      <motion.a
+        ref={ref}
+        href={href}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={cn(
+          'group relative flex h-80 w-full max-w-sm flex-col justify-between overflow-hidden',
+          'rounded-2xl border bg-card p-6 text-card-foreground shadow-sm',
+          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+          className
+        )}
         variants={cardVariants}
         initial="initial"
         whileHover="hover"
-        className="w-full h-full flex"
+        aria-label={`Link to ${title}`}
+        {...props}
       >
-        <Link
-          href={href}
-          ref={ref}
-          className={cn(
-            'group relative flex h-72 md:h-80 w-full min-w-[280px] flex-col justify-between overflow-hidden',
-            'border-2 border-[var(--color-black)] bg-white p-6 md:p-8 text-[var(--color-black)] cursor-pointer',
-            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]',
-            className
-          )}
-          aria-label={`Link to ${title}`}
-          {...props}
-        >
-          {/* Text content */}
-          <div className="z-10 relative">
-            <h3 className="mb-2 text-2xl md:text-3xl font-black uppercase tracking-tight text-[var(--color-black)] group-hover:text-[var(--color-primary)] transition-colors">
-              {title}
-            </h3>
-            <p className="max-w-[80%] text-sm md:text-base font-medium text-black/70">
-              {description}
-            </p>
-          </div>
+        {/* Text content */}
+        <div className="z-10">
+          <h3 className="mb-2 text-3xl font-black uppercase tracking-tight text-card-foreground">
+            {title}
+          </h3>
+          <p className="max-w-[80%] font-medium text-muted-foreground">
+            {description}
+          </p>
+        </div>
 
-          {/* Emoji/Image container with a subtle scale effect on hover */}
-          <div className="absolute bottom-0 right-0 h-40 w-40 md:h-48 md:w-48 translate-x-1/4 translate-y-1/4 transform">
-            {emoji ? (
-              <motion.div
-                className="flex h-full w-full items-center justify-center text-[100px] md:text-[140px] opacity-20 group-hover:opacity-100 transition-all duration-300 group-hover:scale-110 group-hover:-rotate-12"
-              >
-                {emoji}
-              </motion.div>
-            ) : imageUrl ? (
+        {/* Image/Emoji container with a subtle scale effect on hover */}
+        {(imageUrl || emoji) && (
+          <div className={cn(
+            "absolute",
+            centeredImage 
+              ? "bottom-6 right-6 h-28 w-28 flex items-center justify-center" 
+              : "bottom-0 right-0 h-48 w-48 translate-x-1/4 translate-y-1/4 transform"
+          )}>
+            {imageUrl ? (
               <motion.img
                 src={imageUrl}
                 alt={`${title} illustration`}
-                className="h-full w-full object-contain transition-transform duration-300 ease-out group-hover:scale-110"
+                className="h-full w-full object-contain transition-transform duration-300 ease-out group-hover:scale-110 group-hover:-rotate-6"
               />
-            ) : null}
+            ) : (
+              <motion.span 
+                className="flex items-center justify-center h-full w-full text-8xl transition-transform duration-300 ease-out group-hover:scale-125 group-hover:-rotate-12"
+              >
+                {emoji}
+              </motion.span>
+            )}
           </div>
-        </Link>
-      </motion.div>
+        )}
+      </motion.a>
     );
   }
 );

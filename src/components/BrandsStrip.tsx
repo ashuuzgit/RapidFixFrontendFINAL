@@ -12,7 +12,7 @@ export function BrandsStrip() {
     { name: "Suzuki", logo: "/brandLogos/suzuki.webp" },
     { name: "Hyundai", logo: "https://upload.wikimedia.org/wikipedia/commons/4/44/Hyundai_Motor_Company_logo.svg" },
     { name: "Jawa", logo: "/brandLogos/java.webp" },
-    { name: "Harley Davidson", logo: "/brandLogos/harley.webp" },
+    { name: "Harley Davidson", logo: "/brandLogos/davidson.webp" },
     { name: "Volkswagen", logo: "https://upload.wikimedia.org/wikipedia/commons/a/a1/Volkswagen_Logo_till_1995.svg" },
     { name: "Audi", logo: "https://upload.wikimedia.org/wikipedia/commons/9/92/Audi-Logo_2016.svg" },
     { name: "BMW", logo: "https://upload.wikimedia.org/wikipedia/commons/f/f4/BMW_logo_%28gray%29.svg" },
