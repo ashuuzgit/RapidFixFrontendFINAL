@@ -67,7 +67,7 @@ export default function About() {
               description="Watch our master craftsmen at work. Deep dives, engine rebuilds, and behind the scenes." 
               imageUrl="/youtube.webp" 
               centeredImage={true}
-              href="https://youtube.com" 
+              href="https://www.youtube.com/@Farzansaifivlogs786" 
               className="bg-white border-2 border-black text-black w-full"
             />
           </div>
