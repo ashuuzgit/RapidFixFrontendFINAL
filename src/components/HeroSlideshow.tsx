@@ -8,7 +8,7 @@ const SLIDES = [
   { id: 1, image: "/engine.webp", title: "PRECISION ENGINEERING" },
   { id: 2, image: "/sanding.webp", title: "FLAWLESS EXTERIORS" },
   { id: 3, image: "/lifted up.webp", title: "ADVANCED DIAGNOSTICS" },
-  { id: 4, image: "/oil.webp", title: "PREMIUM MAINTENANCE" },
+  { id: 4, image: "/oil.jpg", title: "PREMIUM MAINTENANCE" },
 ]
 
 export function HeroSlideshow() {

@@ -258,6 +258,20 @@ export default function Booking() {
                           <span className="text-xs font-bold uppercase tracking-wider text-center">{b.name}</span>
                         </div>
                       ))}
+                      {/* "Other" Brand Option */}
+                      <div 
+                        onClick={() => setBrand("Other")}
+                        className={`p-4 rounded-lg border-2 cursor-pointer transition-all flex flex-col items-center justify-center gap-3 ${
+                          brand === "Other" 
+                            ? "border-[var(--color-primary)] bg-red-50" 
+                            : "border-[var(--color-grey-200)] hover:border-[var(--color-black)] bg-white"
+                        }`}
+                      >
+                        <div className={`w-12 h-12 flex items-center justify-center rounded-full bg-[var(--color-grey-100)] ${brand === "Other" ? 'text-[var(--color-primary)]' : 'text-black'}`}>
+                          <span className="font-bold text-lg">?</span>
+                        </div>
+                        <span className="text-xs font-bold uppercase tracking-wider text-center">Other</span>
+                      </div>
                     </div>
                   </div>
 

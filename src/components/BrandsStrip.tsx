@@ -17,10 +17,12 @@ export function BrandsStrip() {
     { name: "Audi", logo: "https://upload.wikimedia.org/wikipedia/commons/9/92/Audi-Logo_2016.svg" },
     { name: "BMW", logo: "https://upload.wikimedia.org/wikipedia/commons/f/f4/BMW_logo_%28gray%29.svg" },
     { name: "TVS", logo: "/brandLogos/tvs.webp" },
+    { name: "Ola", logo: "/brandLogos/ola.webp"},
     { name: "Skoda", logo: "/brandLogos/skoda.webp" },
     { name: "KIA", logo: "/brandLogos/kia.webp"},
     { name: "Mercedes", logo: "https://upload.wikimedia.org/wikipedia/commons/9/90/Mercedes-Logo.svg" },
     { name: "Bajaj", logo: "/brandLogos/bajaj.webp"}
+    
     ];
 
   const observerRef = useRef<IntersectionObserver | null>(null);

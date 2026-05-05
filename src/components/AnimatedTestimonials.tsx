@@ -130,16 +130,18 @@ export function AnimatedTestimonials() {
   };
 
   const handleRightBoxEnter = () => {
-    gsap.to(leftBoxRef.current, { width: "40%", backgroundColor: "#ffffff", color: "#000000", duration: 0.8, ease: "power3.out" });
-    gsap.to(rightBoxRef.current, { width: "60%", backgroundColor: "var(--color-grey-100)", color: "#000000", duration: 0.8, ease: "power3.out" });
+    const isDesktop = window.innerWidth >= 1024;
+    gsap.to(leftBoxRef.current, { width: isDesktop ? "40%" : "100%", backgroundColor: "#ffffff", color: "#000000", duration: 0.8, ease: "power3.out" });
+    gsap.to(rightBoxRef.current, { width: isDesktop ? "60%" : "100%", backgroundColor: "var(--color-grey-100)", color: "#000000", duration: 0.8, ease: "power3.out" });
     gsap.to(titleRef.current, { color: "#000000", duration: 0.8, ease: "power3.out" });
     gsap.to(titleSpanRef.current, { color: "rgba(0,0,0,0.2)", duration: 0.8, ease: "power3.out" });
     gsap.to(subtitleRef.current, { color: "var(--color-primary)", duration: 0.8, ease: "power3.out" });
   };
 
   const handleLeftBoxEnter = () => {
-    gsap.to(leftBoxRef.current, { width: "60%", backgroundColor: "#000000", color: "#ffffff", duration: 0.8, ease: "power3.out" });
-    gsap.to(rightBoxRef.current, { width: "40%", backgroundColor: "#ffffff", color: "#000000", duration: 0.8, ease: "power3.out" });
+    const isDesktop = window.innerWidth >= 1024;
+    gsap.to(leftBoxRef.current, { width: isDesktop ? "60%" : "100%", backgroundColor: "#000000", color: "#ffffff", duration: 0.8, ease: "power3.out" });
+    gsap.to(rightBoxRef.current, { width: isDesktop ? "40%" : "100%", backgroundColor: "#ffffff", color: "#000000", duration: 0.8, ease: "power3.out" });
     gsap.to(titleRef.current, { color: "#ffffff", duration: 0.8, ease: "power3.out" });
     gsap.to(titleSpanRef.current, { color: "rgba(255,255,255,0.2)", duration: 0.8, ease: "power3.out" });
     gsap.to(subtitleRef.current, { color: "var(--color-primary)", duration: 0.8, ease: "power3.out" });

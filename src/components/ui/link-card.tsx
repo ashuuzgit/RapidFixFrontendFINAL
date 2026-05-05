@@ -10,12 +10,13 @@ interface LinkCardProps extends HTMLMotionProps<"a"> {
   description: string;
   imageUrl?: string;
   emoji?: string;
+  icon?: React.ReactNode;
   centeredImage?: boolean;
   href: string;
 }
 
 const LinkCard = React.forwardRef<HTMLAnchorElement, LinkCardProps>(
-  ({ className, title, description, imageUrl, emoji, centeredImage, href, ...props }, ref) => {
+  ({ className, title, description, imageUrl, emoji, icon, centeredImage, href, ...props }, ref) => {
     // Animation variants for framer-motion
     const cardVariants: Variants = {
       initial: { scale: 1, y: 0 },
@@ -59,7 +60,7 @@ const LinkCard = React.forwardRef<HTMLAnchorElement, LinkCardProps>(
         </div>
 
         {/* Image/Emoji container with a subtle scale effect on hover */}
-        {(imageUrl || emoji) && (
+        {(imageUrl || emoji || icon) && (
           <div className={cn(
             "absolute",
             centeredImage 
@@ -72,6 +73,12 @@ const LinkCard = React.forwardRef<HTMLAnchorElement, LinkCardProps>(
                 alt={`${title} illustration`}
                 className="h-full w-full object-contain transition-transform duration-300 ease-out group-hover:scale-110 group-hover:-rotate-6"
               />
+            ) : icon ? (
+              <motion.div 
+                className="flex items-center justify-center h-full w-full p-6 transition-transform duration-300 ease-out group-hover:scale-125 group-hover:-rotate-12"
+              >
+                {icon}
+              </motion.div>
             ) : (
               <motion.span 
                 className="flex items-center justify-center h-full w-full text-8xl transition-transform duration-300 ease-out group-hover:scale-125 group-hover:-rotate-12"

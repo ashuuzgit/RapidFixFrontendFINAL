@@ -287,9 +287,9 @@ export function ServiceFlow() {
              <p className="text-black/70 font-medium mb-4 text-sm">
                 Every warning light and strange noise you ignore leads to a more costly future. RapidFix provides swift, reliable service so you can drive with confidence.
              </p>
-             <Link href="/booking" className="w-full mt-4">
-               <Button size="lg" className="w-full group text-xl h-16">
-                 SCHEDULE HOME PICKUP <ArrowRight className="ml-4 group-hover:translate-x-2 transition-transform" />
+             <Link href="/booking" className="w-full mt-4 flex justify-center">
+               <Button size="lg" className="w-full group text-sm sm:text-base md:text-xl h-auto py-4 px-2 whitespace-normal flex items-center justify-center text-center leading-tight max-w-[90vw]">
+                 SCHEDULE HOME PICKUP <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform shrink-0" />
                </Button>
              </Link>
           </div>
