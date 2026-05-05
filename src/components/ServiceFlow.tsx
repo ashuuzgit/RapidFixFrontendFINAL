@@ -178,7 +178,7 @@ export function ServiceFlow() {
                 <div className="w-12 h-1 bg-gray-200 rounded-full mt-1"></div>
               </div>
               <div className="font-black tracking-widest text-sm uppercase flex items-center gap-2">
-                <span className="text-red-500 italic">///</span> CLIENT REQUEST <span className="text-red-500 italic">///</span>
+                <span className="text-red-500 italic"></span> CLIENT REQUEST <span className="text-red-500 italic"></span>
               </div>
             </div>
 
@@ -200,7 +200,7 @@ export function ServiceFlow() {
                 </AnimatePresence>
               </div>
               <div className="font-black tracking-widest text-sm uppercase flex items-center gap-2">
-                <span className="text-green-500 italic">///</span> HOME PICKUP <span className="text-green-500 italic">///</span>
+                <span className="text-green-500 italic"></span> HOME PICKUP <span className="text-green-500 italic"></span>
               </div>
             </div>
 

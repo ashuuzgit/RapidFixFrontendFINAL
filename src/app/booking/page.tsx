@@ -27,7 +27,9 @@ const BRANDS = [
   { name: "Skoda", logo: "/brandLogos/skoda.webp", type: ["Car"] },
   { name: "KIA", logo: "/brandLogos/kia.webp", type: ["Car"] },
   { name: "Mercedes", logo: "https://upload.wikimedia.org/wikipedia/commons/9/90/Mercedes-Logo.svg", type: ["Car"] },
-  { name: "Bajaj", logo: "/brandLogos/bajaj.webp", type: ["Bike"] }
+  { name: "Bajaj", logo: "/brandLogos/bajaj.webp", type: ["Bike"] },
+  { name: "Ola Electric", logo: "/brandLogos/ola.webp", type: ["Bike"] },
+  
 ];
 
 const MODELS_BY_BRAND: Record<string, string[]> = {
@@ -46,7 +48,8 @@ const MODELS_BY_BRAND: Record<string, string[]> = {
   "Skoda": ["Slavia", "Kushaq", "Octavia", "Superb", "Kodiaq"],
   "KIA": ["Seltos", "Sonet", "Carens", "EV6"],
   "Mercedes": ["C-Class", "E-Class", "GLC", "GLE", "S-Class"],
-  "Bajaj": ["Pulsar", "Discover", "Dominar", "Chetak", "Platina"]
+  "Bajaj": ["Pulsar", "Discover", "Dominar", "Chetak", "Platina"],
+  "Ola Electric": ["S1 Pro", "S1 Pro Gen 3","S1 Pro+ 3rd Gen", "S1 Air", "S1 X", "S1 Pro Gen 2"]
 };
 
 const SERVICES = [

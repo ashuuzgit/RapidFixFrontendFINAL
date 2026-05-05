@@ -26,7 +26,7 @@ export function Header() {
     <header className="sticky top-0 z-50 w-full border-b border-[var(--color-grey-200)] bg-[var(--color-white)]">
       <div className="container mx-auto px-4 md:px-8 h-20 flex items-center justify-between relative bg-[var(--color-white)] z-50">
         <Link href="/" className="text-xl md:text-2xl font-bold tracking-tight z-50 relative flex items-center gap-2 md:gap-3 shrink-0">
-          <Image src="/logosvg.svg" alt="RapidFix Logo" width={100} height={100} className="hidden md:block object-contain max-h-12 md:max-h-16 w-auto" />
+          <Image src="/logo.png" alt="RapidFix Logo" width={100} height={100} className="hidden md:block object-contain max-h-12 md:max-h-16 w-auto" />
           <span>RAPID<span className="text-[var(--color-primary)]">FIX</span></span>
         </Link>
         <nav className="hidden md:flex items-center gap-8 text-sm font-bold tracking-wider relative z-50">
@@ -96,18 +96,38 @@ export function Header() {
             <div className="flex flex-col py-4">
               <Link href="/" onClick={() => setIsMobileMenuOpen(false)} className="px-6 py-3 font-bold hover:bg-[var(--color-grey-100)]">HOME</Link>
               
-              <div className="px-6 py-3 font-bold flex flex-col gap-3 border-t border-[var(--color-grey-100)]">
-                <span className="text-gray-500 text-sm">SERVICES</span>
-                {services.map((service, idx) => (
-                  <Link
-                    key={idx}
-                    href={service.href}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className="pl-4 text-sm font-bold text-[var(--color-primary)] py-1 hover:bg-[var(--color-grey-100)]"
-                  >
-                    {service.name}
-                  </Link>
-                ))}
+              <div className="flex flex-col border-t border-[var(--color-grey-100)]">
+                <button 
+                  onClick={() => setIsServicesOpen(!isServicesOpen)}
+                  className="px-6 py-3 font-bold text-left text-gray-500 text-sm hover:bg-[var(--color-grey-100)] flex justify-between items-center"
+                >
+                  SERVICES
+                  <span className="text-xs">{isServicesOpen ? '▲' : '▼'}</span>
+                </button>
+                <AnimatePresence>
+                  {isServicesOpen && (
+                    <motion.div 
+                      initial={{ height: 0 }} 
+                      animate={{ height: "auto" }} 
+                      exit={{ height: 0 }} 
+                      className="overflow-hidden flex flex-col gap-3 px-6 pb-3"
+                    >
+                      {services.map((service, idx) => (
+                        <Link
+                          key={idx}
+                          href={service.href}
+                          onClick={() => {
+                            setIsMobileMenuOpen(false);
+                            setIsServicesOpen(false);
+                          }}
+                          className="pl-4 text-sm font-bold text-[var(--color-primary)] py-1 hover:bg-[var(--color-grey-100)]"
+                        >
+                          {service.name}
+                        </Link>
+                      ))}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
               
               <Link href="/about" onClick={() => setIsMobileMenuOpen(false)} className="px-6 py-3 border-t border-[var(--color-grey-100)] font-bold hover:bg-[var(--color-grey-100)]">ABOUT</Link>
