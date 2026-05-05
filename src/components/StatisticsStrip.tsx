@@ -6,7 +6,7 @@ export function StatisticsStrip() {
           
           <div className="flex flex-col items-center justify-center text-center px-4">
             <h3 className="text-5xl md:text-6xl font-black mb-2 tracking-tighter">10,000+</h3>
-            <p className="text-xs md:text-sm font-bold tracking-widest text-black/60 uppercase">CARS SERVICED</p>
+            <p className="text-xs md:text-sm font-bold tracking-widest text-black/60 uppercase">CARS & BIKES SERVICED</p>
           </div>
 
           <div className="flex flex-col items-center justify-center text-center px-4 pt-12 sm:pt-0">

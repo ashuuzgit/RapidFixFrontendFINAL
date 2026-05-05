@@ -9,7 +9,7 @@ import {
   WheelEvent,
 } from 'react';
 import Image from 'next/image';
-import { motion } from 'framer-motion';
+import { motion, useSpring, useTransform, useMotionValueEvent } from 'framer-motion';
 import { ChevronDown } from 'lucide-react';
 
 interface ScrollExpandMediaProps {
@@ -90,8 +90,8 @@ const ScrollExpandMedia = ({
         e.preventDefault();
       } else if (!mediaFullyExpanded) {
         e.preventDefault();
-        // Increase sensitivity for mobile, especially when scrolling back
-        const scrollFactor = deltaY < 0 ? 0.004 : 0.003; // Smoother touch scrolling
+        // Slower and smoother touch scrolling to prevent bouncy layout shifts
+        const scrollFactor = 0.002;
         const scrollDelta = deltaY * scrollFactor;
         
         setTargetProgress((prev) => {
@@ -153,30 +153,29 @@ const ScrollExpandMedia = ({
     };
   }, [scrollProgress, mediaFullyExpanded, touchStartY]);
 
+  const [targetDimensions, setTargetDimensions] = useState({ width: 1550, height: 800 });
+
   useEffect(() => {
-    const checkIfMobile = (): void => {
-      setIsMobileState(window.innerWidth < 768);
+    const handleResize = () => {
+      const isMobile = window.innerWidth < 768;
+      setIsMobileState(isMobile);
+      setTargetDimensions({
+        width: isMobile ? window.innerWidth * 0.95 : Math.min(1550, window.innerWidth * 0.95),
+        height: isMobile ? window.innerHeight * 0.85 : 800
+      });
     };
 
-    checkIfMobile();
-    window.addEventListener('resize', checkIfMobile);
+    handleResize();
+    window.addEventListener('resize', handleResize);
 
-    return () => window.removeEventListener('resize', checkIfMobile);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  const springProgress = useSpring(0, { damping: 40, stiffness: 80, mass: 1 });
+
   useEffect(() => {
-    let animationFrameId: number;
-    const smoothAnimation = () => {
-      setScrollProgress((prev) => {
-        const diff = targetProgress - prev;
-        if (Math.abs(diff) < 0.0001) return targetProgress;
-        return prev + diff * 0.05; // smoother dampening factor
-      });
-      animationFrameId = requestAnimationFrame(smoothAnimation);
-    };
-    animationFrameId = requestAnimationFrame(smoothAnimation);
-    return () => cancelAnimationFrame(animationFrameId);
-  }, [targetProgress]);
+    springProgress.set(targetProgress);
+  }, [targetProgress, springProgress]);
 
   useEffect(() => {
     if (mediaType === 'sequence') {
@@ -190,27 +189,38 @@ const ScrollExpandMedia = ({
     }
   }, [mediaType]);
 
-  const currentFrameIndex = Math.max(1, Math.min(240, Math.floor(240 - scrollProgress * 239)));
+  // Track the current frame using a ref so we don't need state updates
+  const currentFrameIndexRef = useRef(240);
 
-  useEffect(() => {
-    if (mediaType === 'sequence' && frameImages[currentFrameIndex] && canvasRef.current) {
-      const ctx = canvasRef.current.getContext('2d');
-      const img = frameImages[currentFrameIndex];
-      if (img.complete && img.naturalHeight !== 0) {
-        ctx?.clearRect(0, 0, 1280, 720);
-        ctx?.drawImage(img, 0, 0, 1280, 720);
-      } else {
-        img.onload = () => {
-          ctx?.clearRect(0, 0, 1280, 720);
-          ctx?.drawImage(img, 0, 0, 1280, 720);
-        };
+  // Directly draw to canvas when springProgress changes (bypasses React render)
+  useMotionValueEvent(springProgress, "change", (latest) => {
+    setScrollProgress(latest); // Update state for other components that might need it (like opacity)
+    if (mediaType === 'sequence') {
+      const frame = Math.max(1, Math.min(240, Math.floor(240 - latest * 239)));
+      if (frame !== currentFrameIndexRef.current) {
+        currentFrameIndexRef.current = frame;
+        if (frameImages[frame] && canvasRef.current) {
+          const ctx = canvasRef.current.getContext('2d');
+          const img = frameImages[frame];
+          if (img.complete && img.naturalHeight !== 0) {
+            ctx?.clearRect(0, 0, 1280, 720);
+            ctx?.drawImage(img, 0, 0, 1280, 720);
+          } else {
+            img.onload = () => {
+              ctx?.clearRect(0, 0, 1280, 720);
+              ctx?.drawImage(img, 0, 0, 1280, 720);
+            };
+          }
+        }
       }
     }
-  }, [currentFrameIndex, frameImages, mediaType]);
+  });
 
-  const mediaWidth = 300 + scrollProgress * (isMobileState ? 650 : 1250);
-  const mediaHeight = 400 + scrollProgress * (isMobileState ? 200 : 400);
-  const textTranslateX = scrollProgress * (isMobileState ? 180 : 150);
+  const mediaWidth = useTransform(springProgress, [0, 1], [300, targetDimensions.width]);
+  const mediaHeight = useTransform(springProgress, [0, 1], [400, targetDimensions.height]);
+
+  const textTranslateXLeft = useTransform(springProgress, [0, 1], ["0vw", isMobileState ? "-160vw" : "-60vw"]);
+  const textTranslateXRight = useTransform(springProgress, [0, 1], ["0vw", isMobileState ? "160vw" : "60vw"]);
 
   const firstWord = title ? title.split(' ')[0] : '';
   const restOfTitle = title ? title.split(' ').slice(1).join(' ') : '';
@@ -248,11 +258,12 @@ const ScrollExpandMedia = ({
               <motion.div
                 className='absolute z-0 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 transition-none rounded-2xl'
                 style={{
-                  width: `${mediaWidth}px`,
-                  height: `${mediaHeight}px`,
+                  width: mediaWidth,
+                  height: mediaHeight,
                   maxWidth: '95vw',
                   maxHeight: '85vh',
                   boxShadow: '0px 0px 60px rgba(255, 255, 255, 0.4)',
+                  willChange: 'width, height'
                 }}
                 animate={{ filter: `blur(${Math.max(0, (scrollProgress - 0.8) * 20)}px)` }}
               >
@@ -352,20 +363,20 @@ const ScrollExpandMedia = ({
 
                 <div className='flex flex-col items-center text-center relative z-10 mt-6 transition-none'>
                   {date && (
-                    <p
+                    <motion.p
                       className='text-2xl font-bold tracking-widest text-[var(--color-primary)]'
-                      style={{ transform: `translateX(-${textTranslateX}vw)` }}
+                      style={{ x: textTranslateXLeft }}
                     >
                       {date}
-                    </p>
+                    </motion.p>
                   )}
                   {scrollToExpand && (
-                    <p
+                    <motion.p
                       className='text-[var(--color-primary)] font-bold text-center mt-2 tracking-widest uppercase text-sm'
-                      style={{ transform: `translateX(${textTranslateX}vw)` }}
+                      style={{ x: textTranslateXRight }}
                     >
                       {scrollToExpand}
-                    </p>
+                    </motion.p>
                   )}
                 </div>
               </motion.div>
@@ -376,14 +387,14 @@ const ScrollExpandMedia = ({
                 }`}
               >
                 <motion.h2
-                  className='text-5xl md:text-7xl lg:text-8xl font-black text-white transition-none uppercase tracking-tight drop-shadow-[0_0_20px_rgba(255,255,255,0.4)]'
-                  style={{ transform: `translateX(-${textTranslateX}vw)` }}
+                  className='text-5xl md:text-7xl lg:text-8xl font-black text-white transition-none uppercase tracking-tight drop-shadow-[0_0_20px_rgba(255,255,255,0.4)] whitespace-nowrap'
+                  style={{ x: textTranslateXLeft }}
                 >
                   {firstWord}
                 </motion.h2>
                 <motion.h2
-                  className='text-5xl md:text-7xl lg:text-8xl font-black text-center text-[var(--color-primary)] transition-none uppercase tracking-tight drop-shadow-[0_0_20px_var(--color-primary)]'
-                  style={{ transform: `translateX(${textTranslateX}vw)` }}
+                  className='text-5xl md:text-7xl lg:text-8xl font-black text-center text-[var(--color-primary)] transition-none uppercase tracking-tight drop-shadow-[0_0_20px_var(--color-primary)] whitespace-nowrap'
+                  style={{ x: textTranslateXRight }}
                 >
                   {restOfTitle}
                 </motion.h2>
