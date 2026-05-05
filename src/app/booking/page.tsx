@@ -387,7 +387,7 @@ export default function Booking() {
               {step === 5 && (
                 <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
                   <div>
-                    <h2 className="text-2xl font-bold uppercase">Schedule Bay Time</h2>
+                    <h2 className="text-2xl font-bold uppercase">Schedule Time</h2>
                     <p className="text-[var(--color-grey-800)]">Select an available date for drop-off.</p>
                   </div>
                   
