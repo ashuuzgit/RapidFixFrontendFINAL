@@ -9,7 +9,7 @@ import {
   WheelEvent,
 } from 'react';
 import Image from 'next/image';
-import { motion, useSpring, useTransform, useMotionValueEvent } from 'framer-motion';
+import { motion, useSpring, useTransform, useMotionValueEvent, useMotionValue } from 'framer-motion';
 import { ChevronDown } from 'lucide-react';
 
 interface ScrollExpandMediaProps {
@@ -35,8 +35,6 @@ const ScrollExpandMedia = ({
   textBlend,
   children,
 }: ScrollExpandMediaProps) => {
-  const [targetProgress, setTargetProgress] = useState<number>(0);
-  const [scrollProgress, setScrollProgress] = useState<number>(0);
   const [showContent, setShowContent] = useState<boolean>(false);
   const [mediaFullyExpanded, setMediaFullyExpanded] = useState<boolean>(false);
   const [touchStartY, setTouchStartY] = useState<number>(0);
@@ -45,113 +43,106 @@ const ScrollExpandMedia = ({
   const [frameImages, setFrameImages] = useState<HTMLImageElement[]>([]);
 
   const sectionRef = useRef<HTMLDivElement | null>(null);
+  
+  // Refs for high-performance scroll tracking (prevents listener churn)
+  const targetProgressRef = useRef(0);
+  const mediaFullyExpandedRef = useRef(false);
+  const touchStartYRef = useRef(0);
+
+  const progress = useMotionValue(0);
+  const springProgress = useSpring(progress, { damping: 40, stiffness: 80, mass: 1 });
 
   useEffect(() => {
-    setScrollProgress(0);
-    setTargetProgress(0);
+    progress.set(0);
+    targetProgressRef.current = 0;
     setShowContent(false);
     setMediaFullyExpanded(false);
+    mediaFullyExpandedRef.current = false;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mediaType]);
 
   useEffect(() => {
     const handleWheel = (e: WheelEvent) => {
-      if (mediaFullyExpanded && e.deltaY < 0 && window.scrollY <= 5) {
+      if (mediaFullyExpandedRef.current && e.deltaY < 0 && window.scrollY <= 5) {
         setMediaFullyExpanded(false);
+        mediaFullyExpandedRef.current = false;
         e.preventDefault();
-      } else if (!mediaFullyExpanded) {
+      } else if (!mediaFullyExpandedRef.current) {
         e.preventDefault();
         const scrollDelta = e.deltaY * 0.0004;
-        setTargetProgress((prev) => {
-          const newProgress = Math.min(Math.max(prev + scrollDelta, 0), 1);
-          if (newProgress >= 1) {
-            setMediaFullyExpanded(true);
-            setShowContent(true);
-          } else if (newProgress < 0.75) {
-            setShowContent(false);
-          }
-          return newProgress;
-        });
+        const newProgress = Math.min(Math.max(targetProgressRef.current + scrollDelta, 0), 1);
+        targetProgressRef.current = newProgress;
+        progress.set(newProgress);
+
+        if (newProgress >= 1) {
+          setMediaFullyExpanded(true);
+          mediaFullyExpandedRef.current = true;
+          setShowContent(true);
+        } else if (newProgress < 0.75) {
+          setShowContent(false);
+        }
       }
     };
 
     const handleTouchStart = (e: TouchEvent) => {
-      setTouchStartY(e.touches[0].clientY);
+      touchStartYRef.current = e.touches[0].clientY;
     };
 
     const handleTouchMove = (e: TouchEvent) => {
-      if (!touchStartY) return;
+      if (!touchStartYRef.current) return;
 
       const touchY = e.touches[0].clientY;
-      const deltaY = touchStartY - touchY;
+      const deltaY = touchStartYRef.current - touchY;
 
-      if (mediaFullyExpanded && deltaY < -20 && window.scrollY <= 5) {
+      if (mediaFullyExpandedRef.current && deltaY < -20 && window.scrollY <= 5) {
         setMediaFullyExpanded(false);
+        mediaFullyExpandedRef.current = false;
         e.preventDefault();
-      } else if (!mediaFullyExpanded) {
+      } else if (!mediaFullyExpandedRef.current) {
         e.preventDefault();
-        // Slower and smoother touch scrolling to prevent bouncy layout shifts
         const scrollFactor = 0.002;
         const scrollDelta = deltaY * scrollFactor;
         
-        setTargetProgress((prev) => {
-          const newProgress = Math.min(Math.max(prev + scrollDelta, 0), 1);
-          if (newProgress >= 1) {
-            setMediaFullyExpanded(true);
-            setShowContent(true);
-          } else if (newProgress < 0.75) {
-            setShowContent(false);
-          }
-          return newProgress;
-        });
+        const newProgress = Math.min(Math.max(targetProgressRef.current + scrollDelta, 0), 1);
+        targetProgressRef.current = newProgress;
+        progress.set(newProgress);
 
-        setTouchStartY(touchY);
+        if (newProgress >= 1) {
+          setMediaFullyExpanded(true);
+          mediaFullyExpandedRef.current = true;
+          setShowContent(true);
+        } else if (newProgress < 0.75) {
+          setShowContent(false);
+        }
+
+        touchStartYRef.current = touchY;
       }
     };
 
     const handleTouchEnd = (): void => {
-      setTouchStartY(0);
+      touchStartYRef.current = 0;
     };
 
     const handleScroll = (): void => {
-      if (!mediaFullyExpanded) {
+      if (!mediaFullyExpandedRef.current) {
         window.scrollTo(0, 0);
       }
     };
 
-    window.addEventListener('wheel', handleWheel as unknown as EventListener, {
-      passive: false,
-    });
+    window.addEventListener('wheel', handleWheel as unknown as EventListener, { passive: false });
     window.addEventListener('scroll', handleScroll as EventListener);
-    window.addEventListener(
-      'touchstart',
-      handleTouchStart as unknown as EventListener,
-      { passive: false }
-    );
-    window.addEventListener(
-      'touchmove',
-      handleTouchMove as unknown as EventListener,
-      { passive: false }
-    );
+    window.addEventListener('touchstart', handleTouchStart as unknown as EventListener, { passive: false });
+    window.addEventListener('touchmove', handleTouchMove as unknown as EventListener, { passive: false });
     window.addEventListener('touchend', handleTouchEnd as EventListener);
 
     return () => {
-      window.removeEventListener(
-        'wheel',
-        handleWheel as unknown as EventListener
-      );
+      window.removeEventListener('wheel', handleWheel as unknown as EventListener);
       window.removeEventListener('scroll', handleScroll as EventListener);
-      window.removeEventListener(
-        'touchstart',
-        handleTouchStart as unknown as EventListener
-      );
-      window.removeEventListener(
-        'touchmove',
-        handleTouchMove as unknown as EventListener
-      );
+      window.removeEventListener('touchstart', handleTouchStart as unknown as EventListener);
+      window.removeEventListener('touchmove', handleTouchMove as unknown as EventListener);
       window.removeEventListener('touchend', handleTouchEnd as EventListener);
     };
-  }, [scrollProgress, mediaFullyExpanded, touchStartY]);
+  }, [mediaType, progress]);
 
   const [targetDimensions, setTargetDimensions] = useState({ width: 1550, height: 800 });
 
@@ -171,11 +162,7 @@ const ScrollExpandMedia = ({
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  const springProgress = useSpring(0, { damping: 40, stiffness: 80, mass: 1 });
-
-  useEffect(() => {
-    springProgress.set(targetProgress);
-  }, [targetProgress, springProgress]);
+  // No React state lerp needed anymore - handled by useSpring(progress)
 
   useEffect(() => {
     if (mediaType === 'sequence') {
@@ -194,7 +181,6 @@ const ScrollExpandMedia = ({
 
   // Directly draw to canvas when springProgress changes (bypasses React render)
   useMotionValueEvent(springProgress, "change", (latest) => {
-    setScrollProgress(latest); // Update state for other components that might need it (like opacity)
     if (mediaType === 'sequence') {
       const frame = Math.max(1, Math.min(240, Math.floor(240 - latest * 239)));
       if (frame !== currentFrameIndexRef.current) {
@@ -219,8 +205,13 @@ const ScrollExpandMedia = ({
   const mediaWidth = useTransform(springProgress, [0, 1], [300, targetDimensions.width]);
   const mediaHeight = useTransform(springProgress, [0, 1], [400, targetDimensions.height]);
 
-  const textTranslateXLeft = useTransform(springProgress, [0, 1], ["0vw", isMobileState ? "-160vw" : "-60vw"]);
-  const textTranslateXRight = useTransform(springProgress, [0, 1], ["0vw", isMobileState ? "160vw" : "60vw"]);
+  const textTranslateXLeft = useTransform(springProgress, [0, 0.7], ["0vw", isMobileState ? "-160vw" : "-100vw"]);
+  const textTranslateXRight = useTransform(springProgress, [0, 0.7], ["0vw", isMobileState ? "160vw" : "100vw"]);
+
+  const bgOpacity = useTransform(springProgress, [0, 1], [1, 0]);
+  const videoOverlayOpacity = useTransform(springProgress, [0, 1], [0.5, 0]);
+  const blurValue = useTransform(springProgress, [0.8, 1], [0, 20]);
+  const scrollIndicatorOpacity = useTransform(springProgress, [0.8, 1], [0, 1]);
 
   const firstWord = title ? title.split(' ')[0] : '';
   const restOfTitle = title ? title.split(' ').slice(1).join(' ') : '';
@@ -235,8 +226,7 @@ const ScrollExpandMedia = ({
           <motion.div
             className='absolute inset-0 z-0 h-full'
             initial={{ opacity: 0 }}
-            animate={{ opacity: 1 - scrollProgress }}
-            transition={{ duration: 0.1 }}
+            style={{ opacity: bgOpacity }}
           >
             <Image
               src={bgImageSrc}
@@ -263,9 +253,9 @@ const ScrollExpandMedia = ({
                   maxWidth: '95vw',
                   maxHeight: '85vh',
                   boxShadow: '0px 0px 60px rgba(255, 255, 255, 0.4)',
-                  willChange: 'width, height'
+                  willChange: 'width, height',
+                  filter: useTransform(blurValue, (v) => `blur(${v}px)`)
                 }}
-                animate={{ filter: `blur(${Math.max(0, (scrollProgress - 0.8) * 20)}px)` }}
               >
                 {mediaType === 'sequence' ? (
                   <div className='relative w-full h-full pointer-events-none'>
@@ -277,9 +267,7 @@ const ScrollExpandMedia = ({
                     />
                     <motion.div
                       className='absolute inset-0 bg-black/40 rounded-xl'
-                      initial={{ opacity: 0.7 }}
-                      animate={{ opacity: 0.5 - scrollProgress * 0.5 }}
-                      transition={{ duration: 0.2 }}
+                      style={{ opacity: videoOverlayOpacity }}
                     />
                   </div>
                 ) : mediaType === 'video' ? (
@@ -309,9 +297,7 @@ const ScrollExpandMedia = ({
 
                       <motion.div
                         className='absolute inset-0 bg-black/40 rounded-xl'
-                        initial={{ opacity: 0.7 }}
-                        animate={{ opacity: 0.5 - scrollProgress * 0.3 }}
-                        transition={{ duration: 0.2 }}
+                        style={{ opacity: videoOverlayOpacity }}
                       />
                     </div>
                   ) : (
@@ -336,9 +322,7 @@ const ScrollExpandMedia = ({
 
                       <motion.div
                         className='absolute inset-0 bg-black/40 rounded-xl'
-                        initial={{ opacity: 0.7 }}
-                        animate={{ opacity: 0.5 - scrollProgress * 0.3 }}
-                        transition={{ duration: 0.2 }}
+                        style={{ opacity: videoOverlayOpacity }}
                       />
                     </div>
                   )
@@ -354,9 +338,7 @@ const ScrollExpandMedia = ({
 
                     <motion.div
                       className='absolute inset-0 bg-black/50 rounded-xl'
-                      initial={{ opacity: 0.7 }}
-                      animate={{ opacity: 0.7 - scrollProgress * 0.3 }}
-                      transition={{ duration: 0.2 }}
+                      style={{ opacity: videoOverlayOpacity }}
                     />
                   </div>
                 )}
@@ -402,12 +384,13 @@ const ScrollExpandMedia = ({
 
               {/* Post-Expansion Scroll Indicator */}
               <motion.div 
-                initial={{ opacity: 0 }}
-                animate={{ opacity: scrollProgress > 0.8 ? (scrollProgress - 0.8) * 5 : 0 }}
-                className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center animate-bounce text-white pointer-events-none z-50"
+                style={{ opacity: scrollIndicatorOpacity }}
+                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center animate-bounce text-white pointer-events-none z-50 w-full px-4"
               >
-                <span className="font-black text-white uppercase tracking-tight text-4xl mb-2 drop-shadow-[15px_15px_15px_rgba(255,255,255,0.7)]">SCROLL DOWN</span>
-                <ChevronDown className="w-10 h-10 drop-shadow-[0_0_15px_rgba(255,255,255,0.7)]" strokeWidth={3} />
+                <span className="font-black text-white uppercase tracking-tight text-2xl md:text-4xl mb-4 drop-shadow-[0_10px_10px_rgba(255,255,255,0.7)] text-center block w-full">
+                  SCROLL DOWN
+                </span>
+                <ChevronDown className="w-10 h-10 md:w-12 md:h-12 drop-shadow-[0_0_15px_rgba(255,255,255,0.7)]" strokeWidth={3} />
               </motion.div>
             </div>
 
