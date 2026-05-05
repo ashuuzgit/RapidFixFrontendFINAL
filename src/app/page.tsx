@@ -1,7 +1,7 @@
 import { Button } from "@antigravity/ui/Button"
 import { ArrowRight, ArrowLeft, ShieldCheck, Clock, Banknote } from "lucide-react"
 import Link from "next/link"
-import { HeroSlideshow } from "@/components/HeroSlideshow"
+import ScrollExpandMedia from "@/components/ui/scroll-expansion-hero"
 import dynamic from "next/dynamic"
 const AnimatedServices = dynamic(() => import('@/components/AnimatedServices').then(mod => mod.AnimatedServices))
 import { AnimatedWorkflow } from "@/components/AnimatedWorkflow"
@@ -15,7 +15,14 @@ export default function Home() {
   return (
     <div className="w-full flex flex-col bg-white overflow-hidden relative">
       {/* Hero Section */}
-      <HeroSlideshow />
+      <ScrollExpandMedia
+        mediaType="sequence"
+        mediaSrc=""
+        bgImageSrc="/engine.webp"
+        title="PRECISION ENGINEERING"
+        date="PERFORMANCE"
+
+      />
 
       {/* Guarantees Bar (Image 2) */}
       <section className="border-b-2 border-black bg-white">
