@@ -1,8 +1,8 @@
-"use client"
+"use client";
 
-import { cn } from "@/lib/utils"
-import { getLocalTimeZone, today } from "@internationalized/date"
-import { ComponentProps } from "react"
+import { cn } from "@/lib/utils";
+import { getLocalTimeZone, today } from "@internationalized/date";
+import { ComponentProps } from "react";
 import {
   Button,
   CalendarCell as CalendarCellRac,
@@ -14,16 +14,16 @@ import {
   Heading as HeadingRac,
   RangeCalendar as RangeCalendarRac,
   composeRenderProps,
-} from "react-aria-components"
-import { ChevronLeftIcon, ChevronRightIcon } from "@radix-ui/react-icons"
+} from "react-aria-components";
+import { ChevronLeftIcon, ChevronRightIcon } from "@radix-ui/react-icons";
 
 interface BaseCalendarProps {
-  className?: string
+  className?: string;
 }
 
-type CalendarProps = ComponentProps<typeof CalendarRac> & BaseCalendarProps
+type CalendarProps = ComponentProps<typeof CalendarRac> & BaseCalendarProps;
 type RangeCalendarProps = ComponentProps<typeof RangeCalendarRac> &
-  BaseCalendarProps
+  BaseCalendarProps;
 
 const CalendarHeader = () => (
   <header className="flex w-full items-center gap-1 pb-1">
@@ -31,20 +31,20 @@ const CalendarHeader = () => (
       slot="previous"
       className="flex size-9 items-center justify-center rounded-lg text-[var(--color-grey-600)] outline-offset-2 transition-colors hover:bg-[var(--color-grey-200)] hover:text-[var(--color-black)] focus:outline-none data-[focus-visible]:outline data-[focus-visible]:outline-2 data-[focus-visible]:outline-[var(--color-primary)]"
     >
-      <ChevronLeftIcon size={16} strokeWidth={2} />
+      <ChevronLeftIcon className="h-4 w-4" strokeWidth={2} />
     </Button>
     <HeadingRac className="grow text-center text-sm font-bold uppercase tracking-wider text-[var(--color-black)]" />
     <Button
       slot="next"
       className="flex size-9 items-center justify-center rounded-lg text-[var(--color-grey-600)] outline-offset-2 transition-colors hover:bg-[var(--color-grey-200)] hover:text-[var(--color-black)] focus:outline-none data-[focus-visible]:outline data-[focus-visible]:outline-2 data-[focus-visible]:outline-[var(--color-primary)]"
     >
-      <ChevronRightIcon size={16} strokeWidth={2} />
+      <ChevronRightIcon className="h-4 w-4" strokeWidth={2} />
     </Button>
   </header>
-)
+);
 
 const CalendarGridComponent = ({ isRange = false }: { isRange?: boolean }) => {
-  const now = today(getLocalTimeZone())
+  const now = today(getLocalTimeZone());
 
   return (
     <CalendarGridRac>
@@ -77,8 +77,8 @@ const CalendarGridComponent = ({ isRange = false }: { isRange?: boolean }) => {
         )}
       </CalendarGridBodyRac>
     </CalendarGridRac>
-  )
-}
+  );
+};
 
 const Calendar = ({ className, ...props }: CalendarProps) => {
   return (
@@ -91,8 +91,8 @@ const Calendar = ({ className, ...props }: CalendarProps) => {
       <CalendarHeader />
       <CalendarGridComponent />
     </CalendarRac>
-  )
-}
+  );
+};
 
 const RangeCalendar = ({ className, ...props }: RangeCalendarProps) => {
   return (
@@ -105,7 +105,7 @@ const RangeCalendar = ({ className, ...props }: RangeCalendarProps) => {
       <CalendarHeader />
       <CalendarGridComponent isRange />
     </RangeCalendarRac>
-  )
-}
+  );
+};
 
-export { Calendar, RangeCalendar }
+export { Calendar, RangeCalendar };
