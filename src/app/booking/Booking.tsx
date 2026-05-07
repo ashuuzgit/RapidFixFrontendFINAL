@@ -6,67 +6,402 @@ import { useBookingStore } from "@/store/useBookingStore"
 import { submitBooking } from "@/app/actions/booking"
 import { Button } from "@/components/ui/Button"
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/Card"
-import { CheckCircle2, ArrowRight, ArrowLeft, Loader2, ChevronDown } from "lucide-react"
+import { CheckCircle2, ArrowRight, ArrowLeft, Loader2, ChevronDown, Wrench, Droplets, Zap, CircleDot, Settings, ShieldCheck, Trophy, Snowflake, Clock, Check } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Calendar } from "@/components/ui/calendar-rac"
 import { parseDate, getLocalTimeZone, today } from "@internationalized/date"
 
-const BRANDS = [
-  { name: "Tata", logo: "https://upload.wikimedia.org/wikipedia/commons/8/8e/Tata_logo.svg", type: ["Car"] },
-  { name: "Mahindra", logo: "/brandLogos/mahindra.webp", type: ["Car"] },
-  { name: "Hero", logo: "/brandLogos/hero.webp", type: ["Bike"] },
-  { name: "Honda", logo: "https://upload.wikimedia.org/wikipedia/commons/7/7b/Honda_Logo.svg", type: ["Car", "Bike"] },
-  { name: "Suzuki", logo: "/brandLogos/suzuki.webp", type: ["Car", "Bike"] },
-  { name: "Hyundai", logo: "https://upload.wikimedia.org/wikipedia/commons/4/44/Hyundai_Motor_Company_logo.svg", type: ["Car"] },
-  { name: "Jawa", logo: "/brandLogos/java.webp", type: ["Bike"] },
-  { name: "Harley Davidson", logo: "/brandLogos/harley.webp", type: ["Bike"] },
-  { name: "Volkswagen", logo: "https://upload.wikimedia.org/wikipedia/commons/a/a1/Volkswagen_Logo_till_1995.svg", type: ["Car"] },
-  { name: "Audi", logo: "https://upload.wikimedia.org/wikipedia/commons/9/92/Audi-Logo_2016.svg", type: ["Car"] },
-  { name: "BMW", logo: "https://upload.wikimedia.org/wikipedia/commons/f/f4/BMW_logo_%28gray%29.svg", type: ["Car", "Bike"] },
-  { name: "TVS", logo: "/brandLogos/tvs.webp", type: ["Bike"] },
-  { name: "Skoda", logo: "/brandLogos/skoda.webp", type: ["Car"] },
-  { name: "KIA", logo: "/brandLogos/kia.webp", type: ["Car"] },
-  { name: "Mercedes", logo: "https://upload.wikimedia.org/wikipedia/commons/9/90/Mercedes-Logo.svg", type: ["Car"] },
-  { name: "Bajaj", logo: "/brandLogos/bajaj.webp", type: ["Bike"] },
-  { name: "Ola Electric", logo: "/brandLogos/ola.webp", type: ["Bike"] },
-  
+const BIKE_BRANDS = [
+  { name: "Hero", logo: "/brandLogos/hero.webp" },
+  { name: "Honda", logo: "https://upload.wikimedia.org/wikipedia/commons/7/7b/Honda_Logo.svg" },
+  { name: "TVS", logo: "/brandLogos/tvs.webp" },
+  { name: "Bajaj", logo: "/brandLogos/bajaj.webp" },
+  { name: "Royal Enfield", logo: "/brandLogos/royalenfield.webp" },
+  { name: "Yamaha", logo: "/brandLogos/yamaha.webp" },
+  { name: "Suzuki", logo: "/brandLogos/suzuki.webp" },
+  { name: "KTM", logo: "/brandLogos/ktm.webp" },
+  { name: "Jawa", logo: "/brandLogos/jawa.webp" },
+  { name: "BMW", logo: "https://upload.wikimedia.org/wikipedia/commons/f/f4/BMW_logo_%28gray%29.svg" },
+  { name: "Benelli", logo: "/brandLogos/benelli.webp" },
+  { name: "Ducati", logo: "/brandLogos/ducati.webp" },
+  { name: "Fb Mondial", logo: "/brandLogos/fbmondial.webp" },
+  { name: "Harley Davidson", logo: "/brandLogos/harley.webp" },
+  { name: "Husqvarna", logo: "/brandLogos/husqvarna.webp" },
+  { name: "Hyosung", logo: "/brandLogos/hyosung.webp" },
+  { name: "Indian", logo: "/brandLogos/indian.webp" },
+  { name: "Kawasaki", logo: "/brandLogos/kawasaki.webp" },
+  { name: "Mahindra", logo: "/brandLogos/mahindra.webp" },
+  { name: "Triumph", logo: "/brandLogos/triumph.webp" },
+  { name: "Ola Electric", logo: "/brandLogos/ola.webp" },
 ];
 
-const MODELS_BY_BRAND: Record<string, string[]> = {
-  "Tata": ["Nexon", "Harrier", "Safari", "Punch", "Tiago", "Altroz"],
-  "Mahindra": ["Thar", "XUV700", "Scorpio", "Bolero", "XUV300"],
-  "Hero": ["Splendor", "Passion", "Xpulse", "Glamour", "Destini"],
-  "Honda": ["City", "Amaze", "Civic", "Activa", "Shine", "Dio"],
-  "Suzuki": ["Swift", "Baleno", "Brezza", "Access", "Burgman", "Gixxer"],
-  "Hyundai": ["Creta", "Venue", "i20", "Verna", "Tucson"],
-  "Jawa": ["Jawa 350", "Perak", "Bobber"],
-  "Harley Davidson": ["Iron 883", "Street 750", "Fat Boy", "Pan America"],
-  "Volkswagen": ["Polo", "Vento", "Taigun", "Virtus", "Tiguan"],
-  "Audi": ["A4", "A6", "Q3", "Q5", "Q7"],
-  "BMW": ["3 Series", "5 Series", "X1", "X3", "G 310 R", "S 1000 RR"],
-  "TVS": ["Jupiter", "Apache", "Ntorq", "Ronin", "Raider"],
-  "Skoda": ["Slavia", "Kushaq", "Octavia", "Superb", "Kodiaq"],
-  "KIA": ["Seltos", "Sonet", "Carens", "EV6"],
-  "Mercedes": ["C-Class", "E-Class", "GLC", "GLE", "S-Class"],
-  "Bajaj": ["Pulsar", "Discover", "Dominar", "Chetak", "Platina"],
-  "Ola Electric": ["S1 Pro", "S1 Pro Gen 3","S1 Pro+ 3rd Gen", "S1 Air", "S1 X", "S1 Pro Gen 2"]
+const BIKE_MODELS_BY_BRAND: Record<string, string[]> = {
+  "Hero": [
+    "Splendor Plus", "HF Deluxe", "Passion Pro",
+    "Glamour", "Xtreme 160R", "Xpulse 200",
+    "Xpulse 200T", "Destini 125", "Maestro Edge 125"
+  ],
+  "Honda": [
+    "Activa 6G", "Shine 100", "SP 125",
+    "Dio", "Unicorn", "Hornet 2.0",
+    "CB300R", "CB650R", "Africa Twin"
+  ],
+  "TVS": [
+    "Jupiter", "Ntorq 125", "Raider 125",
+    "Apache RTR 160", "Apache RTR 200 4V", "Apache RR 310",
+    "Ronin", "iQube Electric", "Star City+"
+  ],
+  "Bajaj": [
+    "Pulsar 125", "Pulsar 150", "Pulsar 220F",
+    "Pulsar NS200", "Pulsar RS200", "Dominar 250",
+    "Dominar 400", "Discover 125", "Chetak Electric", "Platina 110"
+  ],
+  "Royal Enfield": [
+    "Classic 350", "Bullet 350", "Meteor 350",
+    "Hunter 350", "Scram 411", "Himalayan 450",
+    "Super Meteor 650", "Interceptor 650", "Continental GT 650"
+  ],
+  "Yamaha": [
+    "FZ-S V3", "FZ-X", "MT-15 V2",
+    "YZF-R15 V4", "YZF-R3", "FZ25",
+    "Aerox 155", "Fascino 125", "Ray ZR 125"
+  ],
+  "Suzuki": [
+    "Access 125", "Burgman Street 125", "Intruder 150",
+    "Gixxer 150", "Gixxer SF 150", "Gixxer 250",
+    "Gixxer SF 250", "V-Strom SX 250", "Hayabusa"
+  ],
+  "KTM": [
+    "Duke 125", "Duke 200", "Duke 250",
+    "Duke 390", "RC 125", "RC 200",
+    "RC 390", "Adventure 250", "Adventure 390"
+  ],
+  "Jawa": [
+    "Jawa 42", "Jawa 42 Bobber", "Jawa 350",
+    "Perak", "Yezdi Roadster", "Yezdi Scrambler"
+  ],
+  "BMW": [
+    "G 310 R", "G 310 GS", "F 900 R",
+    "F 900 XR", "S 1000 RR", "R 1250 GS",
+    "M 1000 RR"
+  ],
+  "Aprilia": [
+    "SR 125", "SR 160", "SR 200",
+    "Storm 125", "RS 457", "Tuono 660"
+  ],
+  "Benelli": [
+    "TRK 502", "TRK 502X", "Leoncino 500",
+    "502C", "302R", "TNT 600i"
+  ],
+  "Ducati": [
+    "Monster", "Scrambler Icon", "Scrambler Desert Sled",
+    "Panigale V2", "Panigale V4", "Multistrada V2",
+    "DesertX"
+  ],
+  "Fb Mondial": [
+    "HPS 125", "HPS 300", "Pagani 125",
+    "SMX 125", "Flat Track 125"
+  ],
+  "Harley Davidson": [
+    "Nightster", "Sportster S", "Iron 883",
+    "Forty-Eight", "Fat Bob", "Fat Boy",
+    "Street Glide", "Road Glide", "Pan America 1250"
+  ],
+  "Husqvarna": [
+    "Svartpilen 250", "Vitpilen 250",
+    "Svartpilen 401", "Vitpilen 401"
+  ],
+  "Hyosung": [
+    "GT250R", "GT650R", "GV300S Aquila Pro",
+    "GT250", "GD250N"
+  ],
+  "Indian": [
+    "Scout", "Scout Bobber", "Chief",
+    "Chieftain", "Springfield", "Challenger",
+    "FTR 1200", "Pursuit"
+  ],
+  "Kawasaki": [
+    "Ninja 300", "Ninja 400", "Ninja 650",
+    "Ninja ZX-10R", "Z650", "Z900",
+    "Versys 650", "W175", "Eliminator 450"
+  ],
+
+  "Triumph": [
+    "Speed 400", "Scrambler 400 X", "Street Triple R",
+    "Speed Triple 1200", "Tiger 900", "Tiger 1200",
+    "Bonneville T100", "Bonneville T120", "Rocket 3"
+  ],
+  "Ola Electric": [
+    "S1 Air", "S1 X", "S1 Pro",
+    "S1 Pro Gen 2", "S1 Pro Gen 3", "S1 Pro+ 3rd Gen"
+  ],
 };
 
-const SERVICES = [
-  "BIKE SERVICE", "CAR SERVICE", "CAR AC REPAIR", "BATTERY", 
-  "TYRE & WHEEL", "ENGINE REPAIR", "DENTING & PAINTING", "EV SERVICE"
+const CAR_BRANDS = [
+  // Mass Market
+  { name: "Tata", logo: "https://upload.wikimedia.org/wikipedia/commons/8/8e/Tata_logo.svg" },
+  { name: "Mahindra", logo: "/brandLogos/mahindra.webp" },
+  { name: "Maruti Suzuki", logo: "https://upload.wikimedia.org/wikipedia/commons/1/12/Suzuki_logo_2.svg" },
+  { name: "Hyundai", logo: "https://upload.wikimedia.org/wikipedia/commons/4/44/Hyundai_Motor_Company_logo.svg" },
+  { name: "Honda", logo: "https://upload.wikimedia.org/wikipedia/commons/7/7b/Honda_Logo.svg" },
+  { name: "Toyota", logo: "https://upload.wikimedia.org/wikipedia/commons/9/9d/Toyota_car_logo.svg" },
+  { name: "KIA", logo: "/brandLogos/kia.webp" },
+  { name: "Renault", logo: "/brandLogos/renault.webp" },
+  { name: "Nissan", logo: "/brandLogos/nissan.webp" },
+  { name: "MG Motor", logo: "/brandLogos/mg.webp" },
+  { name: "Jeep", logo: "/brandLogos/jeep.webp" },
+  { name: "Citroen", logo: "/brandLogos/citroen.webp" },
+  // Premium
+  { name: "Skoda", logo: "/brandLogos/skoda.webp" },
+  { name: "Volkswagen", logo: "https://upload.wikimedia.org/wikipedia/commons/a/a1/Volkswagen_Logo_till_1995.svg" },
+  // Luxury
+  { name: "BMW", logo: "https://upload.wikimedia.org/wikipedia/commons/f/f4/BMW_logo_%28gray%29.svg" },
+  { name: "Mercedes", logo: "https://upload.wikimedia.org/wikipedia/commons/9/90/Mercedes-Logo.svg" },
+  { name: "Audi", logo: "https://upload.wikimedia.org/wikipedia/commons/9/92/Audi-Logo_2016.svg" },
+  { name: "Volvo", logo: "/brandLogos/volvo.webp" },
+  { name: "Lexus", logo: "/brandLogos/lexus.webp" },
+  { name: "Land Rover", logo: "/brandLogos/landrover.webp" },
+  { name: "Porsche", logo: "/brandLogos/porsche.webp" },
+];
+
+const CAR_MODELS_BY_BRAND: Record<string, string[]> = {
+  "Tata": [
+    "Punch", "Tiago", "Tigor",
+    "Altroz", "Nexon", "Harrier",
+    "Safari", "Nexon EV", "Punch EV",
+    "Curvv", "Sierra EV"
+  ],
+  "Mahindra": [
+    "Bolero", "Bolero Neo", "XUV300",
+    "Scorpio Classic", "Scorpio-N", "Thar",
+    "Thar Roxx", "XUV400 EV", "XUV700",
+    "BE 6e", "XEV 9e"
+  ],
+  "Maruti Suzuki": [
+    "Alto K10", "S-Presso", "Celerio",
+    "WagonR", "Swift", "Dzire",
+    "Baleno", "Fronx", "Ignis",
+    "Brezza", "Ertiga", "Grand Vitara",
+    "XL6", "Invicto", "Jimny"
+  ],
+  "Hyundai": [
+    "Exter", "i20", "Venue",
+    "Creta", "Creta Electric", "Alcazar",
+    "Verna", "Tucson", "Ioniq 5",
+    "Ioniq 6"
+  ],
+  "Honda": [
+    "Amaze", "City", "City Hybrid",
+    "Elevate", "WR-V"
+  ],
+  "Toyota": [
+    "Glanza", "Urban Cruiser Taisor", "Rumion",
+    "Innova Crysta", "Innova Hycross", "Fortuner",
+    "Fortuner Legender", "Hilux", "Camry",
+    "Vellfire", "Land Cruiser 300"
+  ],
+  "KIA": [
+    "Sonet", "Seltos", "Carens",
+    "EV6", "EV9", "Carnival"
+  ],
+  "Renault": [
+    "Kwid", "Kiger", "Triber",
+    "Duster"
+  ],
+  "Nissan": [
+    "Magnite", "Kicks", "GT-R",
+    "X-Trail"
+  ],
+  "MG Motor": [
+    "Comet EV", "Hector", "Hector Plus",
+    "Astor", "Gloster", "ZS EV",
+    "Windsor EV"
+  ],
+  "Jeep": [
+    "Compass", "Meridian", "Wrangler",
+    "Grand Cherokee"
+  ],
+  "Citroen": [
+    "C3", "C3 Aircross", "C5 Aircross",
+    "eC3"
+  ],
+  "Skoda": [
+    "Kushaq", "Slavia", "Kodiaq",
+    "Octavia", "Superb", "Enyaq"
+  ],
+  "Volkswagen": [
+    "Polo", "Vento", "Taigun",
+    "Virtus", "Tiguan", "ID.4"
+  ],
+  "BMW": [
+    "2 Series Gran Coupe", "3 Series", "5 Series",
+    "7 Series", "X1", "X3",
+    "X5", "X7", "iX",
+    "i4", "i7", "M3",
+    "M5"
+  ],
+  "Mercedes": [
+    "A-Class Limousine", "C-Class", "E-Class",
+    "S-Class", "GLA", "GLB",
+    "GLC", "GLE", "GLS",
+    "EQB", "EQS", "G-Class",
+    "AMG GT"
+  ],
+  "Audi": [
+    "A4", "A6", "A8",
+    "Q3", "Q5", "Q7",
+    "Q8", "e-tron", "e-tron GT",
+    "RS5", "RS7"
+  ],
+  "Volvo": [
+    "XC40", "XC40 Recharge", "XC60",
+    "XC90", "S60", "S90",
+    "C40 Recharge", "EX40"
+  ],
+  "Lexus": [
+    "UX 300e", "NX", "RX",
+    "ES", "LS", "LX",
+    "LC 500"
+  ],
+  "Land Rover": [
+    "Defender", "Discovery", "Discovery Sport",
+    "Freelander", "Range Rover", "Range Rover Sport",
+    "Range Rover Velar", "Range Rover Evoque"
+  ],
+  "Porsche": [
+    "Macan", "Macan Electric", "Cayenne",
+    "Cayenne Coupe", "Panamera", "Taycan",
+    "911", "718 Boxster", "718 Cayman"
+  ],
+};
+
+
+const BIKE_SERVICES = [
+  {
+    title: "General Service",
+    description: "Available at Doorstep | 500 Kms or 1 Month Warranty",
+    interval: "Every 3000 Kms or 3 Months (Recommended)",
+    duration: "2 Hrs taken",
+    features: [
+      "Air Filter Cleaning", "Battery Voltage Check", "Brakes Service",
+      "Cables & Levers Adjustment", "Chain Tension Check", "Clutch Greasing",
+      "Dry Wash", "Electrical Check-up", "Engine Oil Check",
+      "Greasing & Lubrication", "Oil Leakage Check", "Spark Plug Cleaning"
+    ],
+    prices: {
+      "0 - 150": 799,
+      "150 - 250": 899,
+      "250 - 400": 999
+    },
+    icon: <Wrench className="w-6 h-6" />
+  },
+  {
+    title: "General Service with Engine Oil",
+    description: "Available at Doorstep | 500 Kms or 1 Month Warranty",
+    interval: "Every 3000 Kms or 3 Months (Recommended)",
+    duration: "2 Hrs taken",
+    features: [
+      "Air Filter Cleaning", "Battery Voltage Check", "Brakes Service",
+      "Cables & Levers Adjustment", "Chain Tension Check", "Clutch Greasing",
+      "Dry Wash", "Electrical Check-up", "Engine Oil Change"
+    ],
+    prices: {
+      "0 - 150": 1249,
+      "150 - 250": 1349,
+      "250 - 400": 2549
+    },
+    icon: <Droplets className="w-6 h-6" />
+  },
+  {
+    title: "Jumpstart",
+    description: "Quick battery jumpstart at your location.",
+    price: 450,
+    icon: <Zap className="w-6 h-6" />
+  },
+  {
+    title: "Puncture",
+    description: "On-site tire puncture repair.",
+    price: 600,
+    icon: <CircleDot className="w-6 h-6" />
+  }
+];
+
+const CAR_SERVICES = [
+  {
+    title: "Basic Service",
+    description: "Free Pick Up and Drop | 1000 Kms or 1 Month Warranty",
+    interval: "Every 5000 Kms or 3 Months (Recommended)",
+    duration: "4 Hrs taken",
+    features: [
+      "Air Filter Cleaning", "Battery Water Top Up", "Car Wash",
+      "Coolant Top Up (200 ml)", "Engine Oil Replacement", "Heater/Spark Plugs Checking",
+      "Interior Vacuuming (Carpet & Seats)", "Oil Filter Replacement", "Wiper Fluid Replacement"
+    ],
+    price: 2800,
+    icon: <Settings className="w-6 h-6" />
+  },
+  {
+    title: "Standard Service",
+    description: "Free Pick Up and Drop | 1000 Kms or 1 Month Warranty",
+    interval: "Every 10000 Kms or 6 Months (Recommended)",
+    duration: "6 Hrs taken",
+    features: [
+      "Air Filter Replacement", "AC Filter Cleaning", "Battery Water Top Up",
+      "Brake Fluid Top Up", "Car Scanning", "Car Wash",
+      "Coolant Top Up (200 ml)", "Engine Oil Replacement", "Front Brake Pads Serviced",
+      "Fuel Filter Checking", "Heater/Spark Plugs Checking", "Interior Vacuuming (Carpet & Seats)",
+      "Oil Filter Replacement", "Rear Brake Shoes Serviced", "Wiper Fluid Replacement"
+    ],
+    price: 4200,
+    icon: <ShieldCheck className="w-6 h-6" />
+  },
+  {
+    title: "Comprehensive Service",
+    description: "Free Pick Up and Drop | 1000 Kms or 1 Month Warranty",
+    interval: "Every 20000 Kms or 12 Months (Recommended)",
+    duration: "8 Hrs taken",
+    features: [
+      "Air Filter Replacement", "AC Filter Replacement", "Battery Water Top Up",
+      "Brake Fluid Top Up", "Car Scanning", "Car Wash",
+      "Coolant Top Up (200 ml)", "Engine Oil Replacement", "Engine Flushing",
+      "Front Brake Pads Serviced", "Fuel Filter Checking", "Gear Oil Top Up",
+      "Heater/Spark Plugs Checking", "Interior Vacuuming (Carpet & Seats)", "Oil Filter Replacement",
+      "Rear Brake Shoes Serviced", "Throttle Body Cleaning", "Tyre Rotation",
+      "Wiper Fluid Replacement", "Wheel Alignment", "Wheel Balancing"
+    ],
+    price: 6800,
+    icon: <Trophy className="w-6 h-6" />
+  },
+  {
+    title: "Jumpstart",
+    description: "Emergency battery jumpstart service.",
+    price: 999,
+    icon: <Zap className="w-6 h-6" />
+  },
+  {
+    title: "Puncture",
+    description: "Quick tire repair at your location.",
+    price: 999,
+    icon: <CircleDot className="w-6 h-6" />
+  },
+  {
+    title: "AC service",
+    description: "Complete AC cooling system maintenance.",
+    price: 1499,
+    icon: <Snowflake className="w-6 h-6" />
+  }
 ];
 
 export default function Booking() {
   const searchParams = useSearchParams();
   const { 
-    step, vehicleType, engineType, brand, model, serviceType, date, 
-    setStep, setVehicleType, setEngineType, setBrand, setModel, setServiceType, setDate, reset, getEstimate 
+    step, vehicleType, engineType, brand, model, bikeCC, serviceType, date, 
+    setStep, setVehicleType, setEngineType, setBrand, setModel, setBikeCC, setServiceType, setDate, reset, getEstimate 
   } = useBookingStore();
   
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [bookingResult, setBookingResult] = useState<{success: boolean, bookingId: string, message: string} | null>(null);
-  const [isServiceDropdownOpen, setIsServiceDropdownOpen] = useState(false);
+  const [expandedService, setExpandedService] = useState<string | null>(null);
   const [customModel, setCustomModel] = useState("");
 
   useEffect(() => {
@@ -74,13 +409,16 @@ export default function Booking() {
     const serviceParam = searchParams.get('service');
     if (serviceParam) {
       const formatted = serviceParam.toUpperCase().replace(/_/g, ' ');
-      if (SERVICES.includes(formatted)) {
-        setServiceType(formatted);
-      } else if (formatted === "TYRE WHEEL") {
-        setServiceType("TYRE & WHEEL");
+      // Basic check for legacy services, but now we have specific lists
+      if (vehicleType === "Bike") {
+         const found = BIKE_SERVICES.find(s => s.title.toUpperCase() === formatted);
+         if (found) setServiceType(found.title);
+      } else {
+         const found = CAR_SERVICES.find(s => s.title.toUpperCase() === formatted);
+         if (found) setServiceType(found.title);
       }
     }
-  }, [searchParams, setServiceType]);
+  }, [searchParams, setServiceType, vehicleType]);
 
   const handleNext = () => setStep(step + 1);
   const handleBack = () => setStep(step - 1);
@@ -138,8 +476,8 @@ export default function Booking() {
     );
   }
 
-  const filteredBrands = BRANDS.filter(b => vehicleType ? b.type.includes(vehicleType) : true);
-  const availableModels = brand ? [...(MODELS_BY_BRAND[brand] || []), "Other"] : [];
+  const filteredBrands = vehicleType === "Bike" ? BIKE_BRANDS : CAR_BRANDS;
+  const availableModels = brand ? [...((vehicleType === "Bike" ? BIKE_MODELS_BY_BRAND : CAR_MODELS_BY_BRAND)[brand] || []), "Other"] : [];
 
   return (
     <div className="w-full min-h-[80vh] bg-[var(--color-grey-100)] py-16">
@@ -214,8 +552,11 @@ export default function Booking() {
                     <p className="text-[var(--color-grey-800)]">Select electric or fuel type.</p>
                   </div>
                   
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    {["Petrol", "Diesel", "CNG", "Hybrid", "Electric"].map((type) => (
+                  <div className={`grid gap-4 ${vehicleType === "Car" ? "grid-cols-2 md:grid-cols-3" : "grid-cols-2 md:grid-cols-2"}`}>
+                    {(vehicleType === "Car" 
+                      ? ["Petrol", "Diesel", "CNG", "Hybrid", "Electric"] 
+                      : ["Petrol", "Electric"]
+                    ).map((type) => (
                       <div 
                         key={type}
                         onClick={() => setEngineType(type)}
@@ -332,52 +673,122 @@ export default function Booking() {
                 <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
                   <div>
                     <h2 className="text-2xl font-bold uppercase">Select Service</h2>
-                    <p className="text-[var(--color-grey-800)]">Choose the required service from the dropdown.</p>
+                    <p className="text-[var(--color-grey-800)]">Choose the best plan for your {vehicleType?.toLowerCase()}.</p>
                   </div>
                   
-                  <div className="relative w-full max-w-md">
-                    <button 
-                      onClick={() => setIsServiceDropdownOpen(!isServiceDropdownOpen)}
-                      className="w-full p-4 border-2 border-[var(--color-black)] bg-[var(--color-grey-100)] font-black tracking-widest text-[var(--color-primary)] uppercase flex justify-between items-center"
-                    >
-                      {serviceType || "SELECT SERVICE"}
-                      <ChevronDown className={`transition-transform ${isServiceDropdownOpen ? "rotate-180" : ""}`} />
-                    </button>
-                    <AnimatePresence>
-                      {isServiceDropdownOpen && (
-                        <motion.div
-                          initial={{ opacity: 0, y: -10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: -10 }}
-                          transition={{ duration: 0.2 }}
-                          className="absolute top-full left-0 w-full mt-2 bg-[var(--color-grey-100)] border-2 border-[var(--color-black)] flex flex-col shadow-2xl overflow-hidden z-50"
+                  {vehicleType === "Bike" && (
+                    <div className="bg-[var(--color-grey-100)] p-4 border-2 border-[var(--color-black)] mb-6">
+                      <label className="block text-xs font-black uppercase tracking-widest mb-2">Select Engine CC</label>
+                      <div className="grid grid-cols-3 gap-2">
+                        {["0 - 150", "150 - 250", "250 - 400"].map((cc) => (
+                          <button
+                            key={cc}
+                            onClick={() => setBikeCC(cc)}
+                            className={`p-2 text-xs font-bold border-2 transition-all ${
+                              bikeCC === cc 
+                                ? "bg-[var(--color-primary)] border-[var(--color-primary)] text-white" 
+                                : "bg-white border-[var(--color-grey-300)] hover:border-[var(--color-black)]"
+                            }`}
+                          >
+                            {cc} CC
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="space-y-4">
+                    {(vehicleType === "Bike" ? BIKE_SERVICES : CAR_SERVICES).map((service, idx) => {
+                      const isExpanded = expandedService === service.title;
+                      const isSelected = serviceType === service.title;
+                      const price = (service as any).prices ? (service as any).prices[bikeCC || "0 - 150"] : (service as any).price;
+
+                      return (
+                        <div 
+                          key={idx}
+                          className={`border-2 transition-all overflow-hidden ${
+                            isSelected 
+                              ? "border-[var(--color-primary)] ring-2 ring-[var(--color-primary)] ring-opacity-20" 
+                              : "border-[var(--color-grey-200)]"
+                          }`}
                         >
-                          {SERVICES.map((service, idx) => (
-                            <button
-                              key={idx}
-                              onClick={() => {
-                                setServiceType(service);
-                                setIsServiceDropdownOpen(false);
-                              }}
-                              className="relative z-0 px-4 py-3 text-sm font-black tracking-widest text-[var(--color-primary)] uppercase border-b border-[var(--color-grey-300)] overflow-hidden group text-left"
-                            >
-                              <span className="relative z-10 group-hover:text-white transition-colors duration-300">
-                                {service}
-                              </span>
-                              <div className="absolute inset-0 bg-[var(--color-primary)] origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-out z-[-1]" />
-                            </button>
-                          ))}
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
+                          <div 
+                            onClick={() => {
+                              setServiceType(service.title);
+                              setExpandedService(isExpanded ? null : service.title);
+                            }}
+                            className="p-4 flex items-center justify-between cursor-pointer hover:bg-[var(--color-grey-50)]"
+                          >
+                            <div className="flex items-center gap-4">
+                              <div className={`p-3 rounded-lg ${isSelected ? "bg-[var(--color-primary)] text-white" : "bg-[var(--color-grey-100)] text-[var(--color-grey-600)]"}`}>
+                                {service.icon}
+                              </div>
+                              <div>
+                                <h3 className="font-black text-lg uppercase tracking-tight">{service.title}</h3>
+                                <div className="flex items-center gap-2 mt-1">
+                                  <span className="text-xl font-black text-[var(--color-primary)]">₹{price}</span>
+                                  {service.duration && (
+                                    <span className="text-[10px] font-bold text-[var(--color-grey-500)] flex items-center gap-1 uppercase">
+                                      <Clock className="w-3 h-3" /> {service.duration}
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                            <ChevronDown className={`transition-transform duration-300 ${isExpanded ? "rotate-180" : ""}`} />
+                          </div>
+
+                          <AnimatePresence>
+                            {isExpanded && (
+                              <motion.div
+                                initial={{ height: 0 }}
+                                animate={{ height: "auto" }}
+                                exit={{ height: 0 }}
+                                className="overflow-hidden"
+                              >
+                                <div className="p-4 pt-0 border-t border-[var(--color-grey-100)] bg-[var(--color-grey-50)]">
+                                  <div className="py-4 space-y-4">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                      <div>
+                                        <p className="text-xs font-black uppercase text-[var(--color-grey-500)] mb-2">Details</p>
+                                        <p className="text-sm font-medium leading-relaxed">{service.description}</p>
+                                        {service.interval && (
+                                          <p className="text-xs font-bold text-[var(--color-primary)] mt-2 uppercase">{service.interval}</p>
+                                        )}
+                                      </div>
+                                      {service.features && (
+                                        <div>
+                                          <p className="text-xs font-black uppercase text-[var(--color-grey-500)] mb-2">What's Included</p>
+                                          <div className="grid grid-cols-1 gap-1">
+                                            {service.features.map((f, i) => (
+                                              <div key={i} className="flex items-start gap-2 text-xs font-medium">
+                                                <Check className="w-3 h-3 mt-0.5 text-green-500 shrink-0" />
+                                                <span>{f}</span>
+                                              </div>
+                                            ))}
+                                          </div>
+                                        </div>
+                                      )}
+                                    </div>
+                                    <Button 
+                                      className="w-full"
+                                      onClick={() => setStep(step + 1)}
+                                    >
+                                      Select {service.title} & Continue
+                                    </Button>
+                                  </div>
+                                </div>
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
+                        </div>
+                      );
+                    })}
                   </div>
 
-                  <div className="pt-16 flex justify-between">
+                  <div className="pt-8 flex justify-between">
                     <Button variant="outline" onClick={handleBack}>
                       <ArrowLeft className="mr-2 h-4 w-4" /> Back
-                    </Button>
-                    <Button onClick={handleNext} disabled={!serviceType}>
-                      Next Step <ArrowRight className="ml-2 h-4 w-4" />
                     </Button>
                   </div>
                 </div>
