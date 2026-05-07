@@ -19,7 +19,8 @@ import type {
 // ── Config ────────────────────────────────────────────────────────────────────
 
 const BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8787";
-
+console.log("NEXT_PUBLIC_API_URL =", process.env.NEXT_PUBLIC_API_URL);
+console.log("BASE =", BASE);
 const TOKEN_KEY = "repaiross_token";
 
 export const auth = {
