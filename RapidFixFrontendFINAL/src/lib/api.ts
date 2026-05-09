@@ -82,6 +82,50 @@ export const authApi = {
   logout: () => auth.clearToken(),
 };
 
+// ── Staff ─────────────────────────────────────────────────────────────────────
+
+export interface StaffMember {
+  id: string;
+  name: string;
+  role: string;
+  phone: string;
+  email: string | null;
+  active: boolean;
+  created_at: string;
+}
+
+export const staffApi = {
+  list: (params: { role?: string; active?: boolean } = {}) =>
+    api<{ data: StaffMember[] }>(
+      `/staff${qs({ role: params.role, active: params.active?.toString() })}`,
+    ),
+
+  get: (id: string) => api<StaffMember>(`/staff/${id}`),
+
+  create: (body: {
+    name: string;
+    phone: string;
+    email?: string;
+    role: string;
+  }) =>
+    api<StaffMember>("/staff", { method: "POST", body: JSON.stringify(body) }),
+
+  update: (
+    id: string,
+    body: {
+      name?: string;
+      phone?: string;
+      email?: string;
+      role?: string;
+      active?: boolean;
+    },
+  ) =>
+    api<StaffMember>(`/staff/${id}`, {
+      method: "PATCH",
+      body: JSON.stringify(body),
+    }),
+};
+
 // ── Dashboard ─────────────────────────────────────────────────────────────────
 
 export const dashboardApi = {
@@ -112,6 +156,8 @@ export const jobsApi = {
     estimated_completion?: string;
     booking_id?: string;
   }) => api<Job>("/jobs", { method: "POST", body: JSON.stringify(body) }),
+
+  
 
   update: (
     id: string,
@@ -236,6 +282,10 @@ export const billsApi = {
 
 // ── Customers ─────────────────────────────────────────────────────────────────
 
+export type CustomerLookupResult =
+  | { found: false }
+  | { found: true; customer: Customer };
+
 export const customersApi = {
   list: (
     params: {
@@ -244,6 +294,10 @@ export const customersApi = {
       limit?: number;
     } = {},
   ) => api<CustomersResponse>(`/customers${qs(params)}`),
+
+  // Exact-match by phone — single source of truth
+  lookup: (phone: string) =>
+    api<CustomerLookupResult>(`/customers/lookup${qs({ phone })}`),
 
   get: (id: string) => api<Customer>(`/customers/${id}`),
 
