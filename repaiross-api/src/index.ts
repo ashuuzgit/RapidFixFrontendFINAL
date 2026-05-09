@@ -12,6 +12,10 @@ import vehicles from './routes/vehicles';
 import leads from './routes/leads';
 import webhook from './routes/webhook';
 import notify from './routes/notify';
+// add import at the top with the others
+import staff from './routes/staff';
+
+// add route with the others
 
 export interface Env {
 	SUPABASE_URL: string;
@@ -26,7 +30,7 @@ const app = new Hono<{ Bindings: Env }>();
 
 app.use('*', logger());
 app.use('*', cors({ origin: '*', allowMethods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'] }));
-
+app.route('/staff', staff);
 app.route('/auth', authRoutes);
 app.route('/dashboard', dashboard);
 app.route('/jobs', jobs);

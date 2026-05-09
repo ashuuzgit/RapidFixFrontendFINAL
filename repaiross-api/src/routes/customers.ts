@@ -2,7 +2,6 @@ import { Hono } from 'hono';
 import { AppContext, requireAuth, requireOwner } from '../middleware/auth';
 import { db } from '../type/lib/db';
 
-
 const customers = new Hono<AppContext>();
 
 // GET /customers?search=...&page=1&limit=20
@@ -49,6 +48,27 @@ customers.post('/', requireOwner, async (c) => {
 		return c.json({ error: error.message }, 500);
 	}
 	return c.json(data, 201);
+});
+
+// GET /customers/lookup?phone=9876543210
+// NOTE: must stay above /:id so Hono doesn't treat "lookup" as an id param
+customers.get('/lookup', requireAuth, async (c) => {
+	const phone = c.req.query('phone')?.trim();
+
+	if (!phone) return c.json({ error: 'phone query param is required' }, 400);
+
+	const supabase = db(c.env);
+
+	const { data, error } = await supabase
+		.from('customers')
+		.select('id, name, phone, email, whatsapp_opt_in')
+		.eq('phone', phone)
+		.maybeSingle();
+
+	if (error) return c.json({ error: error.message }, 500);
+	if (!data) return c.json({ found: false }, 200);
+
+	return c.json({ found: true, customer: data });
 });
 
 // GET /customers/:id  — returns customer + vehicles + recent jobs
@@ -114,13 +134,11 @@ customers.post('/:id/messages', requireOwner, async (c) => {
 	const customerId = c.req.param('id');
 	const { body: msgBody } = await c.req.json();
 
-	// Get customer + location WA creds
 	const { data: customer } = await supabase.from('customers').select('phone, whatsapp_opt_in').eq('id', customerId).single();
 
 	if (!customer) return c.json({ error: 'Customer not found' }, 404);
 	if (!customer.whatsapp_opt_in) return c.json({ error: 'Customer has opted out of WhatsApp' }, 422);
 
-	// Use owner's primary location WA credentials
 	const { data: location } = await supabase.from('locations').select('wa_number_id, wa_access_token').eq('active', true).limit(1).single();
 
 	if (!location?.wa_number_id) return c.json({ error: 'WhatsApp not configured' }, 500);

@@ -3,6 +3,7 @@ import { AppContext, requireAuth, requireOwner } from '../middleware/auth';
 import { db } from '../type/lib/db';
 import { waSendText } from '../type/lib/whatsapp';
 
+
 function jobStatusMessage(
   customerName: string,
   vehicleLabel: string,
