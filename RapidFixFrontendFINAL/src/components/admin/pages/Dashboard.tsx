@@ -71,21 +71,38 @@ interface StatCardProps {
   icon: string; // Tabler icon class e.g. "ti-tool"
   accent: string; // Top border + icon color
   loading: boolean; // Shows skeleton when true
+  onClick?: () => void;
 }
 
-function StatCard({ label, value, sub, icon, accent, loading }: StatCardProps) {
+function StatCard({
+  label,
+  value,
+  sub,
+  icon,
+  accent,
+  loading,
+  onClick,
+}: StatCardProps) {
   return (
     <div
+      onClick={onClick}
       style={{
         background: C.surface,
         border: `1px solid ${C.border}`,
         borderRadius: 4,
         padding: "16px 18px",
-        // Colored top border is the visual accent for each card
         borderTop: `3px solid ${accent}`,
+        cursor: onClick ? "pointer" : "default",
+        transition: "box-shadow 0.15s",
+      }}
+      onMouseEnter={(e) => {
+        if (onClick)
+          e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.08)";
+      }}
+      onMouseLeave={(e) => {
+        if (onClick) e.currentTarget.style.boxShadow = "none";
       }}
     >
-      {/* Card header: label on left, icon on right */}
       <div
         style={{
           display: "flex",
@@ -108,7 +125,6 @@ function StatCard({ label, value, sub, icon, accent, loading }: StatCardProps) {
         <i className={`ti ${icon}`} style={{ fontSize: 16, color: accent }} />
       </div>
 
-      {/* Show skeleton placeholder while loading, real values once ready */}
       {loading ? (
         <>
           <Skeleton w={80} h={20} />
@@ -299,34 +315,34 @@ export function Dashboard({ setPage }: DashboardProps) {
     {
       label: "Open Jobs",
       value: String(openJobs),
-      // Sub-line shows the two most actionable statuses at a glance
       sub: `${dash?.jobs.received ?? 0} received · ${dash?.jobs.in_progress ?? 0} in progress`,
       icon: "ti-tool",
       accent: "#f48024",
+      onClick: () => setPage("jobs"),
     },
     {
       label: "Today's Bookings",
-      // Count comes from the bookings API response, not the dashboard endpoint
       value: String(bookings.length),
       sub: `${bookings.filter((b) => b.status === "pending").length} pending confirmation`,
       icon: "ti-calendar",
       accent: C.info,
+      onClick: () => setPage("bookings"),
     },
     {
       label: "Revenue (MTD)",
-      // month = month-to-date revenue from paid + partial bills
       value: formatRupees(dash?.revenue.month ?? 0),
       sub: `Today ${formatRupees(dash?.revenue.today ?? 0)} · Week ${formatRupees(dash?.revenue.week ?? 0)}`,
       icon: "ti-coin",
       accent: C.success,
+      onClick: () => setPage("bills"),
     },
     {
       label: "New Leads Today",
-      // Leads that arrived via WhatsApp since midnight
       value: String(dash?.new_leads_today ?? 0),
       sub: "from WhatsApp",
       icon: "ti-message-circle-2",
       accent: C.warning,
+      onClick: () => setPage("leads"),
     },
   ];
 

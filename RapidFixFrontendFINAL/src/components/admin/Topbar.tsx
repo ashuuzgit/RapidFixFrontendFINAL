@@ -8,9 +8,16 @@ interface TopbarProps {
   staff: StaffPayload;
   onMenuToggle: () => void;
   onLogout: () => void;
+  setPage: (p: Page) => void;
 }
 
-export function Topbar({ page, staff, onMenuToggle, onLogout }: TopbarProps) {
+export function Topbar({
+  page,
+  staff,
+  onMenuToggle,
+  onLogout,
+  setPage,
+}: TopbarProps) {
   const label = NAV.find((n) => n.id === page)?.label ?? page;
 
   return (
@@ -60,7 +67,12 @@ export function Topbar({ page, staff, onMenuToggle, onLogout }: TopbarProps) {
           </button>
 
           <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-            <span style={{ fontSize: 11, color: C.textSec }}>RepairOS</span>
+            <span
+              onClick={() => setPage("dashboard")}
+              style={{ fontSize: 11, color: C.textSec, cursor: "pointer" }}
+            >
+              RepairOS
+            </span>
 
             <span style={{ color: "#d1d5db", fontSize: 13 }}>/</span>
 

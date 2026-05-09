@@ -21,6 +21,7 @@ export function LeadPopup() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    if (window.location.pathname.startsWith("/admin")) return;
     const t = setTimeout(() => setIsOpen(true), 3000);
     return () => clearTimeout(t);
   }, []);

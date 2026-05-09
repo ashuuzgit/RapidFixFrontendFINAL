@@ -4,8 +4,6 @@ import { C, LEAD_STATUS_CFG } from "@/lib/constants";
 import { leadsApi } from "@/lib/api";
 import type { Lead, LeadStatus } from "@/lib/types";
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
-
 const FILTERS: { label: string; value: LeadStatus | "all" }[] = [
   { label: "All", value: "all" },
   { label: "New", value: "new" },
@@ -116,7 +114,6 @@ function StatusBadge({
         {cfg.label}
         <span style={{ fontSize: 9, opacity: 0.6 }}>▾</span>
       </button>
-
       {open && (
         <>
           <div
@@ -179,13 +176,11 @@ function StatusBadge({
 
 function CopyPhone({ phone }: { phone: string }) {
   const [copied, setCopied] = useState(false);
-
   async function copy() {
     await navigator.clipboard.writeText(phone);
     setCopied(true);
     setTimeout(() => setCopied(false), 1500);
   }
-
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
       <span style={{ fontFamily: "'Courier New', monospace", fontSize: 12 }}>
@@ -193,7 +188,6 @@ function CopyPhone({ phone }: { phone: string }) {
       </span>
       <button
         onClick={copy}
-        title="Copy phone number"
         style={{
           padding: "2px 6px",
           fontSize: 11,
@@ -208,6 +202,64 @@ function CopyPhone({ phone }: { phone: string }) {
       >
         {copied ? "✓ Copied" : "Copy"}
       </button>
+    </div>
+  );
+}
+
+// ── Card (mobile) ─────────────────────────────────────────────────────────────
+
+function LeadCard({ lead, onChanged }: { lead: Lead; onChanged: () => void }) {
+  return (
+    <div
+      style={{
+        padding: "14px 16px",
+        borderBottom: `1px solid ${C.borderFaint}`,
+        display: "flex",
+        flexDirection: "column",
+        gap: 10,
+      }}
+    >
+      {/* Row 1: phone + status */}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 8,
+        }}
+      >
+        <CopyPhone phone={lead.phone} />
+        <StatusBadge
+          leadId={lead.id}
+          current={lead.status}
+          onChanged={onChanged}
+        />
+      </div>
+
+      {/* Row 2: name */}
+      {lead.customer_name && (
+        <div style={{ fontSize: 13, color: C.text, fontWeight: 500 }}>
+          {lead.customer_name}
+        </div>
+      )}
+
+      {/* Row 3: source + assigned + time */}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 8,
+          flexWrap: "wrap",
+        }}
+      >
+        <SourceBadge source={lead.source ?? undefined} />
+        <span style={{ fontSize: 11, color: C.textMuted }}>
+          {lead.staff ? `→ ${lead.staff.name}` : "Unassigned"}
+        </span>
+        <span style={{ fontSize: 11, color: C.textMuted, marginLeft: "auto" }}>
+          {formatIST(lead.created_at)}
+        </span>
+      </div>
     </div>
   );
 }
@@ -251,7 +303,7 @@ export function Leads() {
 
   const totalPages = Math.ceil(total / LIMIT);
 
-  const cols = [
+  const desktopCols = [
     { label: "Phone", width: "22%" },
     { label: "Name", width: "18%" },
     { label: "Source", width: "12%" },
@@ -273,17 +325,8 @@ export function Leads() {
           gap: 10,
         }}
       >
-        {/* Filter tabs */}
-        <div
-          style={{
-            display: "flex",
-            background: "#f0f2f5",
-            padding: 2,
-            borderRadius: 4,
-            gap: 1,
-            flexWrap: "wrap",
-          }}
-        >
+        {/* Filter tabs — horizontally scrollable on mobile */}
+        <div className="leads-filter-bar">
           {FILTERS.map((f) => (
             <button
               key={f.value}
@@ -293,6 +336,7 @@ export function Leads() {
                 fontSize: 12,
                 borderRadius: 3,
                 border: "none",
+                whiteSpace: "nowrap",
                 background: filter === f.value ? C.surface : "transparent",
                 color: filter === f.value ? C.text : C.textSec,
                 fontWeight: filter === f.value ? 500 : 400,
@@ -356,17 +400,18 @@ export function Leads() {
           overflow: "hidden",
         }}
       >
-        {/* Header */}
+        {/* Desktop header */}
         <div
+          className="leads-desktop-header"
           style={{
             display: "grid",
-            gridTemplateColumns: cols.map((c) => c.width).join(" "),
+            gridTemplateColumns: desktopCols.map((c) => c.width).join(" "),
             padding: "9px 16px",
             background: C.bg,
             borderBottom: `1px solid ${C.border}`,
           }}
         >
-          {cols.map((col) => (
+          {desktopCols.map((col) => (
             <span
               key={col.label}
               style={{
@@ -385,28 +430,51 @@ export function Leads() {
         {/* Body */}
         {loading ? (
           <div>
-            {Array.from({ length: 8 }).map((_, i) => (
+            {Array.from({ length: 6 }).map((_, i) => (
               <div
                 key={i}
+                className="leads-skeleton-row"
                 style={{
-                  display: "flex",
-                  gap: 16,
-                  padding: "12px 16px",
+                  padding: "14px 16px",
                   borderBottom: `1px solid ${C.borderFaint}`,
                 }}
               >
-                {[160, 120, 80, 90, 100, 140].map((w, j) => (
-                  <div
-                    key={j}
-                    style={{
-                      height: 12,
-                      borderRadius: 3,
-                      background: C.borderFaint,
-                      width: w,
-                      animation: "pulse 1.5s ease-in-out infinite",
-                    }}
-                  />
-                ))}
+                {/* Desktop skeleton */}
+                <div
+                  className="leads-skeleton-desktop"
+                  style={{ display: "flex", gap: 16 }}
+                >
+                  {[160, 120, 80, 90, 100, 140].map((w, j) => (
+                    <div
+                      key={j}
+                      style={{
+                        height: 12,
+                        borderRadius: 3,
+                        background: C.borderFaint,
+                        width: w,
+                        animation: "pulse 1.5s ease-in-out infinite",
+                      }}
+                    />
+                  ))}
+                </div>
+                {/* Mobile skeleton */}
+                <div
+                  className="leads-skeleton-mobile"
+                  style={{ display: "flex", flexDirection: "column", gap: 8 }}
+                >
+                  {[200, 120, 160].map((w, j) => (
+                    <div
+                      key={j}
+                      style={{
+                        height: 12,
+                        borderRadius: 3,
+                        background: C.borderFaint,
+                        width: w,
+                        animation: "pulse 1.5s ease-in-out infinite",
+                      }}
+                    />
+                  ))}
+                </div>
               </div>
             ))}
           </div>
@@ -427,63 +495,64 @@ export function Leads() {
           </div>
         ) : (
           leads.map((lead) => (
-            <div
-              key={lead.id}
-              style={{
-                display: "grid",
-                gridTemplateColumns: cols.map((c) => c.width).join(" "),
-                padding: "11px 16px",
-                borderBottom: `1px solid ${C.borderFaint}`,
-                alignItems: "center",
-                transition: "background 0.1s",
-              }}
-              onMouseEnter={(e) => (e.currentTarget.style.background = C.bg)}
-              onMouseLeave={(e) =>
-                (e.currentTarget.style.background = "transparent")
-              }
-            >
-              {/* Phone + copy */}
-              <div>
-                <CopyPhone phone={lead.phone} />
-              </div>
-
-              {/* Name */}
+            <div key={lead.id}>
+              {/* Desktop row */}
               <div
+                className="leads-desktop-row"
                 style={{
-                  fontSize: 13,
-                  color: lead.customer_name ? C.text : C.textMuted,
+                  display: "grid",
+                  gridTemplateColumns: desktopCols
+                    .map((c) => c.width)
+                    .join(" "),
+                  padding: "11px 16px",
+                  borderBottom: `1px solid ${C.borderFaint}`,
+                  alignItems: "center",
+                  transition: "background 0.1s",
                 }}
+                onMouseEnter={(e) => (e.currentTarget.style.background = C.bg)}
+                onMouseLeave={(e) =>
+                  (e.currentTarget.style.background = "transparent")
+                }
               >
-                {lead.customer_name ?? <span style={{ fontSize: 12 }}>—</span>}
+                <div>
+                  <CopyPhone phone={lead.phone} />
+                </div>
+                <div
+                  style={{
+                    fontSize: 13,
+                    color: lead.customer_name ? C.text : C.textMuted,
+                  }}
+                >
+                  {lead.customer_name ?? (
+                    <span style={{ fontSize: 12 }}>—</span>
+                  )}
+                </div>
+                <div>
+                  <SourceBadge source={lead.source ?? undefined} />
+                </div>
+                <div>
+                  <StatusBadge
+                    leadId={lead.id}
+                    current={lead.status}
+                    onChanged={fetchLeads}
+                  />
+                </div>
+                <div
+                  style={{
+                    fontSize: 12,
+                    color: lead.staff ? C.text : C.textMuted,
+                  }}
+                >
+                  {lead.staff?.name ?? "Unassigned"}
+                </div>
+                <div style={{ fontSize: 12, color: C.textSec }}>
+                  {formatIST(lead.created_at)}
+                </div>
               </div>
 
-              {/* Source */}
-              <div>
-                <SourceBadge source={lead.source ?? undefined} />
-              </div>
-
-              {/* Status */}
-              <div>
-                <StatusBadge
-                  leadId={lead.id}
-                  current={lead.status}
-                  onChanged={fetchLeads}
-                />
-              </div>
-
-              {/* Assigned */}
-              <div
-                style={{
-                  fontSize: 12,
-                  color: lead.staff ? C.text : C.textMuted,
-                }}
-              >
-                {lead.staff?.name ?? <span>Unassigned</span>}
-              </div>
-
-              {/* Timestamp IST */}
-              <div style={{ fontSize: 12, color: C.textSec }}>
-                {formatIST(lead.created_at)}
+              {/* Mobile card */}
+              <div className="leads-mobile-card">
+                <LeadCard lead={lead} onChanged={fetchLeads} />
               </div>
             </div>
           ))
@@ -495,20 +564,17 @@ export function Leads() {
         <div
           style={{
             display: "flex",
-            justifyContent: "flex-end",
+            justifyContent: "space-between",
             alignItems: "center",
             gap: 8,
             marginTop: 12,
           }}
         >
-          <span style={{ fontSize: 12, color: C.textSec }}>
-            Page {page} of {totalPages}
-          </span>
           <button
             disabled={page === 1}
             onClick={() => setPage((p) => p - 1)}
             style={{
-              padding: "5px 10px",
+              padding: "7px 16px",
               borderRadius: 4,
               fontSize: 12,
               background: C.surface,
@@ -519,11 +585,14 @@ export function Leads() {
           >
             ← Prev
           </button>
+          <span style={{ fontSize: 12, color: C.textSec }}>
+            {page} / {totalPages}
+          </span>
           <button
             disabled={page === totalPages}
             onClick={() => setPage((p) => p + 1)}
             style={{
-              padding: "5px 10px",
+              padding: "7px 16px",
               borderRadius: 4,
               fontSize: 12,
               background: C.surface,
@@ -541,6 +610,36 @@ export function Leads() {
         @keyframes pulse {
           0%, 100% { opacity: 1; }
           50% { opacity: 0.4; }
+        }
+
+        /* Filter bar scrollable on mobile */
+        .leads-filter-bar {
+          display: flex;
+          background: #f0f2f5;
+          padding: 2px;
+          border-radius: 4px;
+          gap: 1px;
+          overflow-x: auto;
+          -webkit-overflow-scrolling: touch;
+          scrollbar-width: none;
+          max-width: 100%;
+        }
+        .leads-filter-bar::-webkit-scrollbar { display: none; }
+
+        /* Desktop: show table, hide cards */
+        .leads-desktop-header { display: grid; }
+        .leads-desktop-row    { display: grid; }
+        .leads-mobile-card    { display: none; }
+        .leads-skeleton-desktop { display: flex; }
+        .leads-skeleton-mobile  { display: none; }
+
+        /* Mobile: hide table, show cards */
+        @media (max-width: 640px) {
+          .leads-desktop-header { display: none !important; }
+          .leads-desktop-row    { display: none !important; }
+          .leads-mobile-card    { display: block; }
+          .leads-skeleton-desktop { display: none; }
+          .leads-skeleton-mobile  { display: flex; }
         }
       `}</style>
     </div>
