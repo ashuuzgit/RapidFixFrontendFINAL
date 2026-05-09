@@ -1,0 +1,26 @@
+{
+  "name": "repaiross-api",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "deploy": "wrangler deploy",
+    "dev": "wrangler dev",
+    "start": "wrangler dev",
+    "test": "vitest",
+    "cf-typegen": "wrangler types"
+  },
+  "devDependencies": {
+    "@cloudflare/vitest-pool-workers": "^0.12.4",
+    "@types/node": "^25.6.0",
+    "typescript": "^5.5.2",
+    "vitest": "~3.2.0",
+    "wrangler": "^4.88.0"
+  },
+  "dependencies": {
+    "@hono/node-server": "^2.0.1",
+    "@supabase/supabase-js": "^2.105.3",
+    "@types/jsonwebtoken": "^9.0.10",
+    "hono": "^4.12.17",
+    "jsonwebtoken": "^9.0.3"
+  }
+}
