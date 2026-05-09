@@ -64,7 +64,7 @@ export default function Home() {
                 Transparent Pricing
               </h4>
               <p className="text-xs text-black/50 tracking-wider font-bold">
-                ₹399 BOOKING CHARGE
+                NO HIDDEN CHARGES
               </p>
             </div>
           </div>
@@ -86,7 +86,10 @@ export default function Home() {
               ensures maximum performance and reliability.
             </p>
           </div>
-          <div className="p-8 md:p-16 lg:p-24 flex items-center justify-center bg-white/80 backdrop-blur-sm">
+          <div className="p-8 md:p-16 lg:p-24 flex items-center justify-center bg-white/80 backdrop-blur-sm relative overflow-hidden">
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[15vw] font-black opacity-[0.03] uppercase tracking-tighter whitespace-nowrap z-[-1] pointer-events-none text-black">
+              NOW
+            </div>
             <Link href="/booking" className="w-full">
               <Button size="lg" className="w-full group">
                 BOOK A SERVICE{" "}

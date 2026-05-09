@@ -154,7 +154,7 @@ export function ServiceFlow() {
             {/* Top Center: Rapid Fix */}
             <div className="absolute top-[20%] left-[50%] -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
               <div className="w-24 h-24 bg-white border-2 border-black rounded-full flex items-center justify-center shadow-md z-10 relative">
-                <Image src="/logo.png" alt="RapidFix Logo" width={60} height={60} className="object-contain" />
+                <Image src="/NewLogoSvg.svg" alt="RapidFix Logo" width={60} height={60} className="object-contain" />
                 <AnimatePresence>
                   {phase === "toast" && (
                     <motion.div 
@@ -184,8 +184,8 @@ export function ServiceFlow() {
 
             {/* Bottom Right: Home Pickup */}
             <div className="absolute top-[80%] left-[85%] -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
-              <div className="w-24 h-20 bg-white border-2 border-black rounded-xl flex items-center justify-center shadow-md mb-4 relative z-10">
-                <Truck size={40} className="text-green-500" />
+              <div className="w-24 h-24 bg-white border-2 border-black rounded-xl flex items-center justify-center shadow-md mb-4 relative z-10">
+                <Truck size={50} className="text-green-500" />
                 <AnimatePresence>
                   {phase === "arrived" && (
                     <motion.div 
@@ -240,7 +240,7 @@ export function ServiceFlow() {
                   </motion.div>
                 </div>
                 <div className="w-20 h-20 bg-white border-2 border-black rounded-full flex items-center justify-center shadow-md relative">
-                  <Image src="/logo.png" alt="RapidFix Logo" width={40} height={40} className="object-contain" />
+                  <Image src="/NewLogoSvg.svg" alt="RapidFix Logo" width={40} height={40} className="object-contain" />
                   <AnimatePresence>
                     {phase === "toast" && (
                       <motion.div 

@@ -3,10 +3,9 @@
 import { useState, useEffect } from "react"
 import { useSearchParams } from "next/navigation"
 import { useBookingStore } from "@/store/useBookingStore"
-import { submitBooking } from "@/app/actions/booking"
 import { Button } from "@/components/ui/Button"
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/Card"
-import { CheckCircle2, ArrowRight, ArrowLeft, Loader2, ChevronDown, Wrench, Droplets, Zap, CircleDot, Settings, ShieldCheck, Trophy, Snowflake, Clock, Check } from "lucide-react"
+import { ArrowRight, ArrowLeft, Loader2, ChevronDown, ChevronRight, ChevronLeft, Wrench, Droplets, Zap, CircleDot, Settings, ShieldCheck, Trophy, Snowflake, Clock, Check, CheckCircle2 } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Calendar } from "@/components/ui/calendar-rac"
 import { parseDate, getLocalTimeZone, today } from "@internationalized/date"
@@ -16,22 +15,20 @@ const BIKE_BRANDS = [
   { name: "Honda", logo: "https://upload.wikimedia.org/wikipedia/commons/7/7b/Honda_Logo.svg" },
   { name: "TVS", logo: "/brandLogos/tvs.webp" },
   { name: "Bajaj", logo: "/brandLogos/bajaj.webp" },
-  { name: "Royal Enfield", logo: "/brandLogos/royalenfield.webp" },
+  { name: "Royal Enfield", logo: "/brandLogos/Royal_Enfield.svg" },
   { name: "Yamaha", logo: "/brandLogos/yamaha.webp" },
   { name: "Suzuki", logo: "/brandLogos/suzuki.webp" },
-  { name: "KTM", logo: "/brandLogos/ktm.webp" },
-  { name: "Jawa", logo: "/brandLogos/jawa.webp" },
+  { name: "KTM", logo: "/brandLogos/KTM.svg"},
+  { name: "Jawa", logo: "/brandLogos/java.webp" },
   { name: "BMW", logo: "https://upload.wikimedia.org/wikipedia/commons/f/f4/BMW_logo_%28gray%29.svg" },
-  { name: "Benelli", logo: "/brandLogos/benelli.webp" },
-  { name: "Ducati", logo: "/brandLogos/ducati.webp" },
-  { name: "Fb Mondial", logo: "/brandLogos/fbmondial.webp" },
+  { name: "Benelli", logo: "/brandLogos/benelli.png" },
+  { name: "Ducati", logo: "/brandLogos/ducati.svg" },
   { name: "Harley Davidson", logo: "/brandLogos/harley.webp" },
-  { name: "Husqvarna", logo: "/brandLogos/husqvarna.webp" },
-  { name: "Hyosung", logo: "/brandLogos/hyosung.webp" },
-  { name: "Indian", logo: "/brandLogos/indian.webp" },
-  { name: "Kawasaki", logo: "/brandLogos/kawasaki.webp" },
-  { name: "Mahindra", logo: "/brandLogos/mahindra.webp" },
-  { name: "Triumph", logo: "/brandLogos/triumph.webp" },
+  { name: "Husqvarna", logo: "/brandLogos/Husqvarna.svg" },
+  { name: "Hyosung", logo: "/brandLogos/hyosung.svg" },
+  { name: "Indian", logo: "/brandLogos/indian.svg" },
+  { name: "Kawasaki", logo: "/brandLogos/kawasaki.svg" },
+  { name: "Triumph", logo: "/brandLogos/triumph.svg" },
   { name: "Ola Electric", logo: "/brandLogos/ola.webp" },
 ];
 
@@ -141,16 +138,16 @@ const CAR_BRANDS = [
   // Mass Market
   { name: "Tata", logo: "https://upload.wikimedia.org/wikipedia/commons/8/8e/Tata_logo.svg" },
   { name: "Mahindra", logo: "/brandLogos/mahindra.webp" },
-  { name: "Maruti Suzuki", logo: "https://upload.wikimedia.org/wikipedia/commons/1/12/Suzuki_logo_2.svg" },
-  { name: "Hyundai", logo: "https://upload.wikimedia.org/wikipedia/commons/4/44/Hyundai_Motor_Company_logo.svg" },
+  { name: "Maruti Suzuki", logo: "/brandLogos/suzuki.webp" },
+  { name: "Hyundai", logo: "/brandLogos/Hyundai.webp" },
   { name: "Honda", logo: "https://upload.wikimedia.org/wikipedia/commons/7/7b/Honda_Logo.svg" },
-  { name: "Toyota", logo: "https://upload.wikimedia.org/wikipedia/commons/9/9d/Toyota_car_logo.svg" },
+  { name: "Toyota", logo: "/brandLogos/toyota.svg" },
   { name: "KIA", logo: "/brandLogos/kia.webp" },
-  { name: "Renault", logo: "/brandLogos/renault.webp" },
+  { name: "Renault", logo: "/brandLogos/Renault copy.webp" },
   { name: "Nissan", logo: "/brandLogos/nissan.webp" },
-  { name: "MG Motor", logo: "/brandLogos/mg.webp" },
-  { name: "Jeep", logo: "/brandLogos/jeep.webp" },
-  { name: "Citroen", logo: "/brandLogos/citroen.webp" },
+  { name: "MG Motor", logo: "/brandLogos/MG.svg" },
+  { name: "Jeep", logo: "/brandLogos/jeep.svg" },
+  { name: "Citroen", logo: "/brandLogos/citroen.svg" },
   // Premium
   { name: "Skoda", logo: "/brandLogos/skoda.webp" },
   { name: "Volkswagen", logo: "https://upload.wikimedia.org/wikipedia/commons/a/a1/Volkswagen_Logo_till_1995.svg" },
@@ -159,9 +156,9 @@ const CAR_BRANDS = [
   { name: "Mercedes", logo: "https://upload.wikimedia.org/wikipedia/commons/9/90/Mercedes-Logo.svg" },
   { name: "Audi", logo: "https://upload.wikimedia.org/wikipedia/commons/9/92/Audi-Logo_2016.svg" },
   { name: "Volvo", logo: "/brandLogos/volvo.webp" },
-  { name: "Lexus", logo: "/brandLogos/lexus.webp" },
+  { name: "Lexus", logo: "/brandLogos/lexus.svg" },
   { name: "Land Rover", logo: "/brandLogos/landrover.webp" },
-  { name: "Porsche", logo: "/brandLogos/porsche.webp" },
+  { name: "Porsche", logo: "/brandLogos/porsche.png" },
 ];
 
 const CAR_MODELS_BY_BRAND: Record<string, string[]> = {
@@ -399,10 +396,13 @@ export default function Booking() {
     setStep, setVehicleType, setEngineType, setBrand, setModel, setBikeCC, setServiceType, setDate, reset, getEstimate 
   } = useBookingStore();
   
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [bookingResult, setBookingResult] = useState<{success: boolean, bookingId: string, message: string} | null>(null);
   const [expandedService, setExpandedService] = useState<string | null>(null);
   const [customModel, setCustomModel] = useState("");
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     // If arriving from a link with a ?service= param, set it
@@ -423,22 +423,6 @@ export default function Booking() {
   const handleNext = () => setStep(step + 1);
   const handleBack = () => setStep(step - 1);
 
-  const handleSubmit = async () => {
-    if (!vehicleType || !engineType || !brand || !model || !serviceType || !date) return;
-    
-    setIsSubmitting(true);
-    try {
-      const result = await submitBooking({
-        vehicleType,
-        serviceType,
-        date,
-        estimate: getEstimate()
-      });
-      setBookingResult(result);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
 
   const handleModelSelect = (m: string) => {
     if (m === "Other") {
@@ -449,35 +433,17 @@ export default function Booking() {
     }
   };
 
-  if (bookingResult) {
-    return (
-      <div className="w-full min-h-[80vh] flex items-center justify-center bg-[var(--color-grey-100)]">
-        <Card className="max-w-md w-full p-8 text-center border-none shadow-xl">
-          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6 text-[var(--color-success)]">
-            <CheckCircle2 className="w-8 h-8" />
-          </div>
-          <h2 className="text-3xl font-bold mb-2">Booking Confirmed</h2>
-          <p className="text-[var(--color-grey-800)] mb-6">{bookingResult.message}</p>
-          <div className="bg-[var(--color-grey-100)] p-4 rounded-md mb-8">
-            <p className="text-sm font-bold text-[var(--color-grey-800)] mb-1">BOOKING ID</p>
-            <p className="text-xl font-mono">{bookingResult.bookingId}</p>
-          </div>
-          <Button 
-            className="w-full" 
-            onClick={() => {
-              reset();
-              setBookingResult(null);
-            }}
-          >
-            Book Another Service
-          </Button>
-        </Card>
-      </div>
-    );
-  }
 
   const filteredBrands = vehicleType === "Bike" ? BIKE_BRANDS : CAR_BRANDS;
   const availableModels = brand ? [...((vehicleType === "Bike" ? BIKE_MODELS_BY_BRAND : CAR_MODELS_BY_BRAND)[brand] || []), "Other"] : [];
+
+  if (!mounted) {
+    return (
+      <div className="w-full min-h-screen bg-[var(--color-grey-100)] flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-[var(--color-primary)]" />
+      </div>
+    );
+  }
 
   return (
     <div className="w-full min-h-[80vh] bg-[var(--color-grey-100)] py-16">
@@ -489,10 +455,10 @@ export default function Booking() {
             <div className="absolute left-0 top-1/2 -translate-y-1/2 w-full h-1 bg-[var(--color-grey-300)] -z-10 rounded-full"></div>
             <div 
               className="absolute left-0 top-1/2 -translate-y-1/2 h-1 bg-[var(--color-primary)] -z-10 rounded-full transition-all duration-300"
-              style={{ width: `${((step - 1) / 4) * 100}%` }}
+              style={{ width: `${((step - 1) / 3) * 100}%` }}
             ></div>
             
-            {[1, 2, 3, 4, 5].map((num) => (
+            {[1, 2, 3, 4].map((num) => (
               <div 
                 key={num}
                 className={`w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center font-bold text-xs md:text-sm transition-colors border-2 ${
@@ -525,22 +491,31 @@ export default function Booking() {
                       <div 
                         key={type}
                         onClick={() => setVehicleType(type)}
-                        className={`p-6 rounded-lg border-2 cursor-pointer transition-all flex items-center justify-center gap-4 ${
+                        className={`h-20 md:h-24 rounded-none border-2 cursor-pointer transition-all active:scale-95 flex items-center justify-center gap-4 group relative overflow-hidden ${
                           vehicleType === type 
-                            ? "border-[var(--color-primary)] bg-red-50 text-[var(--color-primary)]" 
-                            : "border-[var(--color-grey-200)] hover:border-[var(--color-black)] bg-white"
+                            ? "border-[var(--color-primary)] bg-[var(--color-primary)] text-white" 
+                            : "border-[var(--color-grey-200)] bg-white text-black"
                         }`}
                       >
-                        <h3 className="font-black text-2xl uppercase">{type}</h3>
+                        <div className="relative z-10 flex items-center gap-3">
+                           <h3 className="font-black text-2xl md:text-3xl uppercase tracking-widest">{type}</h3>
+                        </div>
+                        {/* Premium Diagonal Hover */}
+                        <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-500 skew-y-12 origin-bottom"></div>
                       </div>
                     ))}
                   </div>
 
-                  <div className="pt-6 flex justify-end">
-                    <Button onClick={handleNext} disabled={!vehicleType}>
-                      Next Step <ArrowRight className="ml-2 h-4 w-4" />
+                    <Button 
+                      onClick={handleNext} 
+                      disabled={!vehicleType}
+                      className="w-full md:w-64 h-14 md:h-16 text-lg font-black uppercase tracking-[0.2em] rounded-none group relative overflow-hidden bg-[var(--color-grey-200)] text-black border-2 border-black active:scale-95 transition-transform"
+                    >
+                      <div className="relative z-10 flex items-center justify-center gap-3">
+                        Next Step <ChevronRight className="w-5 h-5 group-hover:translate-x-2 transition-transform" />
+                      </div>
+                      <div className="absolute inset-0 bg-white/10 translate-y-full group-hover:translate-y-0 transition-transform duration-500 skew-y-12 origin-bottom"></div>
                     </Button>
-                  </div>
                 </div>
               )}
 
@@ -560,23 +535,38 @@ export default function Booking() {
                       <div 
                         key={type}
                         onClick={() => setEngineType(type)}
-                        className={`p-4 rounded-lg border-2 cursor-pointer transition-all text-center ${
+                        className={`h-14 md:h-16 rounded-none border-2 cursor-pointer transition-all active:scale-95 flex items-center justify-center text-center group relative overflow-hidden ${
                           engineType === type 
-                            ? "border-[var(--color-primary)] bg-red-50 text-[var(--color-primary)]" 
-                            : "border-[var(--color-grey-200)] hover:border-[var(--color-black)] bg-white"
+                            ? "border-[var(--color-primary)] bg-[var(--color-primary)] text-white" 
+                            : "border-[var(--color-grey-200)] bg-white text-black"
                         }`}
                       >
-                        <h3 className="font-bold text-lg uppercase">{type}</h3>
+                        <h3 className="relative z-10 font-black text-base md:text-lg uppercase tracking-widest">{type}</h3>
+                        <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-500 skew-y-12 origin-bottom"></div>
                       </div>
                     ))}
                   </div>
 
-                  <div className="pt-6 flex justify-between">
-                    <Button variant="outline" onClick={handleBack}>
-                      <ArrowLeft className="mr-2 h-4 w-4" /> Back
+                  <div className="pt-8 flex flex-col md:flex-row justify-between gap-4">
+                    <Button 
+                      variant="outline" 
+                      onClick={handleBack}
+                      className="w-full md:w-40 h-14 md:h-16 text-lg font-black uppercase tracking-[0.2em] rounded-none group relative overflow-hidden bg-white text-black border-2 border-black active:scale-95 transition-transform"
+                    >
+                      <div className="relative z-10 flex items-center justify-center gap-3">
+                        <ChevronLeft className="w-5 h-5 group-hover:-translate-x-2 transition-transform" /> Back
+                      </div>
+                      <div className="absolute inset-0 bg-black/5 translate-y-full group-hover:translate-y-0 transition-transform duration-500 skew-y-12 origin-bottom"></div>
                     </Button>
-                    <Button onClick={handleNext} disabled={!engineType}>
-                      Next Step <ArrowRight className="ml-2 h-4 w-4" />
+                    <Button 
+                      onClick={handleNext} 
+                      disabled={!engineType}
+                      className="w-full md:w-64 h-14 md:h-16 text-lg font-black uppercase tracking-[0.2em] rounded-none group relative overflow-hidden bg-[var(--color-grey-200)] text-black border-2 border-black active:scale-95 transition-transform"
+                    >
+                      <div className="relative z-10 flex items-center justify-center gap-3">
+                        Next Step <ChevronRight className="w-5 h-5 group-hover:translate-x-2 transition-transform" />
+                      </div>
+                      <div className="absolute inset-0 bg-white/10 translate-y-full group-hover:translate-y-0 transition-transform duration-500 skew-y-12 origin-bottom"></div>
                     </Button>
                   </div>
                 </div>
@@ -589,32 +579,34 @@ export default function Booking() {
                     <h2 className="text-2xl font-bold uppercase">Select Brand</h2>
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mt-4 max-h-60 overflow-y-auto pr-2 custom-scrollbar">
                       {filteredBrands.map((b) => (
-                        <div 
-                          key={b.name}
-                          onClick={() => setBrand(b.name)}
-                          className={`p-4 rounded-lg border-2 cursor-pointer transition-all flex flex-col items-center justify-center gap-3 ${
-                            brand === b.name 
-                              ? "border-[var(--color-primary)] bg-red-50" 
-                              : "border-[var(--color-grey-200)] hover:border-[var(--color-black)] bg-white"
-                          }`}
-                        >
-                          <img src={b.logo} alt={b.name} className={`w-12 h-12 object-contain ${brand === b.name ? 'grayscale-0' : 'grayscale'}`} />
-                          <span className="text-xs font-bold uppercase tracking-wider text-center">{b.name}</span>
-                        </div>
+                          <div 
+                            key={b.name}
+                            onClick={() => setBrand(b.name)}
+                            className={`h-20 md:h-24 rounded-none border-2 cursor-pointer transition-all active:scale-95 flex flex-col items-center justify-center gap-2 group relative overflow-hidden ${
+                              brand === b.name 
+                                ? "border-[var(--color-primary)] bg-[var(--color-primary)] text-white" 
+                                : "border-[var(--color-grey-200)] bg-white text-black"
+                            }`}
+                          >
+                            <img src={b.logo} alt={b.name} className={`w-8 h-8 md:w-10 md:h-10 object-contain relative z-10 ${brand === b.name ? 'brightness-0 invert' : ''}`} />
+                            <span className="text-[10px] font-black uppercase tracking-widest text-center relative z-10">{b.name}</span>
+                            <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-500 skew-y-12 origin-bottom"></div>
+                          </div>
                       ))}
                       {/* "Other" Brand Option */}
                       <div 
                         onClick={() => setBrand("Other")}
-                        className={`p-4 rounded-lg border-2 cursor-pointer transition-all flex flex-col items-center justify-center gap-3 ${
+                        className={`h-20 md:h-24 rounded-none border-2 cursor-pointer transition-all active:scale-95 flex flex-col items-center justify-center gap-2 group relative overflow-hidden ${
                           brand === "Other" 
-                            ? "border-[var(--color-primary)] bg-red-50" 
-                            : "border-[var(--color-grey-200)] hover:border-[var(--color-black)] bg-white"
+                            ? "border-[var(--color-primary)] bg-[var(--color-primary)] text-white" 
+                            : "border-[var(--color-grey-200)] bg-white text-black"
                         }`}
                       >
-                        <div className={`w-12 h-12 flex items-center justify-center rounded-full bg-[var(--color-grey-100)] ${brand === "Other" ? 'text-[var(--color-primary)]' : 'text-black'}`}>
-                          <span className="font-bold text-lg">?</span>
+                        <div className={`relative z-10 w-8 h-8 md:w-10 md:h-10 flex items-center justify-center rounded-full ${brand === "Other" ? 'bg-white/20 text-white' : 'bg-[var(--color-grey-100)] text-black'}`}>
+                          <span className="font-black text-sm md:text-lg">?</span>
                         </div>
-                        <span className="text-xs font-bold uppercase tracking-wider text-center">Other</span>
+                        <span className="relative z-10 text-[10px] font-black uppercase tracking-widest text-center">Other</span>
+                        <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-500 skew-y-12 origin-bottom"></div>
                       </div>
                     </div>
                   </div>
@@ -622,20 +614,23 @@ export default function Booking() {
                   {brand && (
                     <div className="animate-in fade-in duration-300">
                       <h2 className="text-2xl font-bold uppercase mb-4">Select Model</h2>
-                      <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                        {availableModels.map((m) => (
-                          <div 
-                            key={m}
-                            onClick={() => handleModelSelect(m)}
-                            className={`p-3 rounded-lg border-2 cursor-pointer transition-all text-center ${
-                              model === m || (m === "Other" && model === "Other")
-                                ? "border-[var(--color-primary)] bg-red-50 text-[var(--color-primary)]" 
-                                : "border-[var(--color-grey-200)] hover:border-[var(--color-black)] bg-white"
-                            }`}
-                          >
-                            <span className="font-bold text-sm uppercase">{m}</span>
-                          </div>
-                        ))}
+                      <div className="max-h-60 overflow-y-auto pr-2 custom-scrollbar">
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                          {availableModels.map((m) => (
+                            <div 
+                              key={m}
+                              onClick={() => handleModelSelect(m)}
+                              className={`h-14 md:h-16 rounded-none border-2 cursor-pointer transition-all active:scale-95 flex items-center justify-center text-center group relative overflow-hidden ${
+                                model === m || (m === "Other" && model === "Other")
+                                  ? "border-[var(--color-primary)] bg-[var(--color-primary)] text-white" 
+                                  : "border-[var(--color-grey-200)] bg-white text-black"
+                              }`}
+                            >
+                              <span className="relative z-10 font-black text-xs md:text-sm uppercase tracking-widest">{m}</span>
+                              <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-500 skew-y-12 origin-bottom"></div>
+                            </div>
+                          ))}
+                        </div>
                       </div>
                       
                       {model === "Other" && (
@@ -652,18 +647,33 @@ export default function Booking() {
                     </div>
                   )}
 
-                  <div className="pt-6 flex justify-between">
-                    <Button variant="outline" onClick={handleBack}>
-                      <ArrowLeft className="mr-2 h-4 w-4" /> Back
+                  <div className="pt-8 flex flex-col md:flex-row justify-between gap-4">
+                    <Button 
+                      variant="outline" 
+                      onClick={handleBack}
+                      className="w-full md:w-40 h-14 md:h-16 text-lg font-black uppercase tracking-[0.2em] rounded-none group relative overflow-hidden bg-white text-black border-2 border-black active:scale-95 transition-transform"
+                    >
+                      <div className="relative z-10 flex items-center justify-center gap-3">
+                        <ChevronLeft className="w-5 h-5 group-hover:-translate-x-2 transition-transform" /> Back
+                      </div>
+                      <div className="absolute inset-0 bg-black/5 translate-y-full group-hover:translate-y-0 transition-transform duration-500 skew-y-12 origin-bottom"></div>
                     </Button>
-                    <Button onClick={handleNext} disabled={!brand || !model || (model === "Other" && !customModel)}>
-                      Next Step <ArrowRight className="ml-2 h-4 w-4" />
+                    <Button 
+                      onClick={handleNext} 
+                      disabled={!brand || !model || (model === "Other" && !customModel)}
+                      className="w-full md:w-64 h-14 md:h-16 text-lg font-black uppercase tracking-[0.2em] rounded-none group relative overflow-hidden bg-[var(--color-grey-200)] text-black border-2 border-black active:scale-95 transition-transform"
+                    >
+                      <div className="relative z-10 flex items-center justify-center gap-3">
+                        Next Step <ChevronRight className="w-5 h-5 group-hover:translate-x-2 transition-transform" />
+                      </div>
+                      <div className="absolute inset-0 bg-white/10 translate-y-full group-hover:translate-y-0 transition-transform duration-500 skew-y-12 origin-bottom"></div>
                     </Button>
                   </div>
                   <style dangerouslySetInnerHTML={{__html: `
-                    .custom-scrollbar::-webkit-scrollbar { width: 6px; }
-                    .custom-scrollbar::-webkit-scrollbar-track { background: var(--color-grey-200); border-radius: 10px; }
-                    .custom-scrollbar::-webkit-scrollbar-thumb { background: var(--color-grey-400); border-radius: 10px; }
+                    .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+                    .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+                    .custom-scrollbar::-webkit-scrollbar-thumb { background: #000000; border-radius: 0px; }
+                    .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #333333; }
                   `}} />
                 </div>
               )}
@@ -771,10 +781,13 @@ export default function Booking() {
                                       )}
                                     </div>
                                     <Button 
-                                      className="w-full"
-                                      onClick={() => setStep(step + 1)}
+                                      className="w-full h-14 md:h-16 text-lg font-black uppercase tracking-[0.2em] rounded-none group relative overflow-hidden bg-[var(--color-grey-200)] text-black border-2 border-black active:scale-95 transition-transform"
+                                      onClick={() => window.location.href = '/checkout'}
                                     >
-                                      Select {service.title} & Continue
+                                      <div className="relative z-10 flex items-center justify-center gap-3">
+                                        Select & Checkout <ChevronRight className="w-5 h-5 group-hover:translate-x-2 transition-transform" />
+                                      </div>
+                                      <div className="absolute inset-0 bg-white/10 translate-y-full group-hover:translate-y-0 transition-transform duration-500 skew-y-12 origin-bottom"></div>
                                     </Button>
                                   </div>
                                 </div>
@@ -786,37 +799,16 @@ export default function Booking() {
                     })}
                   </div>
 
-                  <div className="pt-8 flex justify-between">
-                    <Button variant="outline" onClick={handleBack}>
-                      <ArrowLeft className="mr-2 h-4 w-4" /> Back
-                    </Button>
-                  </div>
-                </div>
-              )}
-
-              {/* Step 5: Schedule */}
-              {step === 5 && (
-                <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
-                  <div>
-                    <h2 className="text-2xl font-bold uppercase">Schedule Time</h2>
-                    <p className="text-[var(--color-grey-800)]">Select an available date for drop-off.</p>
-                  </div>
-                  
-                  <div className="flex justify-center sm:justify-start">
-                    <Calendar 
-                      className="rounded-lg border-2 border-[var(--color-black)] p-4 bg-white shadow-md" 
-                      value={date ? parseDate(date) : null} 
-                      onChange={(v) => setDate(v.toString())} 
-                      minValue={today(getLocalTimeZone())}
-                    />
-                  </div>
-
-                  <div className="pt-6 flex justify-between">
-                    <Button variant="outline" onClick={handleBack}>
-                      <ArrowLeft className="mr-2 h-4 w-4" /> Back
-                    </Button>
-                    <Button onClick={handleSubmit} disabled={!date || isSubmitting}>
-                      {isSubmitting ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Processing</> : "Confirm Booking"}
+                  <div className="pt-8">
+                    <Button 
+                      variant="outline" 
+                      onClick={handleBack}
+                      className="w-full md:w-40 h-14 md:h-16 text-lg font-black uppercase tracking-[0.2em] rounded-none group relative overflow-hidden bg-white text-black border-2 border-black active:scale-95 transition-transform"
+                    >
+                      <div className="relative z-10 flex items-center justify-center gap-3">
+                        <ChevronLeft className="w-5 h-5 group-hover:-translate-x-2 transition-transform" /> Back
+                      </div>
+                      <div className="absolute inset-0 bg-black/5 translate-y-full group-hover:translate-y-0 transition-transform duration-500 skew-y-12 origin-bottom"></div>
                     </Button>
                   </div>
                 </div>
@@ -865,11 +857,11 @@ export default function Booking() {
 
                 <div className="bg-[var(--color-grey-100)] p-4 rounded-lg mt-6">
                   <div className="flex justify-between items-center">
-                    <span className="text-sm font-black uppercase">Booking Charge</span>
+                    <span className="text-sm font-black uppercase">Cost Estimation</span>
                     <span className="text-3xl font-black text-[var(--color-primary)]">₹{getEstimate()}</span>
                   </div>
                   <p className="text-[10px] text-[var(--color-grey-600)] mt-2 font-bold uppercase text-center">
-                    *Cost will vary additionally according to parts and work
+                    *Cost may vary additionally according to parts and work
                   </p>
                 </div>
               </div>

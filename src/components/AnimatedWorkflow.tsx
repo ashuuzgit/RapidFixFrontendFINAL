@@ -121,7 +121,7 @@ export function AnimatedWorkflow() {
               className="absolute top-0 left-0 -translate-x-1/2 -translate-y-1/2 z-30 bg-white rounded-full p-2 border-2 border-[var(--color-primary)] flex items-center justify-center w-16 h-16 md:w-20 md:h-20 shadow-lg"
             >
               <img 
-                src="/logo.png" 
+                src="/NewLogoSvg.svg" 
                 alt="Logo" 
                 className="w-full h-full object-contain" 
               />

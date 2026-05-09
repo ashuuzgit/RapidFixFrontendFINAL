@@ -1,6 +1,9 @@
 export function StatisticsStrip() {
   return (
-    <section className="bg-[var(--color-grey-100)] border-b-2 border-black py-16 md:py-24 relative z-10">
+    <section className="bg-[var(--color-grey-100)] border-b-2 border-black py-16 md:py-24 relative z-10 overflow-hidden">
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[15vw] font-black opacity-[0.03] uppercase tracking-tighter whitespace-nowrap z-0 pointer-events-none text-black">
+        METRICS
+      </div>
       <div className="container mx-auto px-8">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-8 divide-y-2 sm:divide-y-0 sm:divide-x-2 divide-black/10">
           

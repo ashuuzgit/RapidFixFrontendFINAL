@@ -39,7 +39,10 @@ export function FAQSection() {
   };
 
   return (
-    <section className="bg-black text-white py-24 relative z-10 border-b-2 border-white/10">
+    <section className="bg-black text-white py-24 relative z-10 border-b-2 border-white/10 overflow-hidden">
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[15vw] font-black opacity-[0.05] uppercase tracking-tighter whitespace-nowrap z-[-1] pointer-events-none text-white">
+        QUESTIONS
+      </div>
       {/* JSON-LD Schema for SEO */}
       <script
         type="application/ld+json"

@@ -58,7 +58,10 @@ export function BrandsStrip() {
 
   return (
     <section className="border-b-2 border-black bg-white overflow-hidden py-16 relative z-20">
-      <div className="text-center mb-10">
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[15vw] font-black opacity-[0.03] uppercase tracking-tighter whitespace-nowrap z-[-1] pointer-events-none text-black">
+        TOP BRANDS
+      </div>
+      <div className="text-center mb-10 relative z-10">
         <h2 className="text-3xl font-black uppercase tracking-tight">Brands We Serve</h2>
         <p className="text-muted-foreground mt-2 font-medium">Precision engineering for all major manufacturers.</p>
       </div>
@@ -75,12 +78,12 @@ export function BrandsStrip() {
               <div 
                 key={idx} 
                 data-index={idx}
-                className="brand-logo flex items-center justify-center mx-8 md:mx-12 shrink-0 py-8"
+                className="brand-logo flex items-center justify-center mx-12 md:mx-20 shrink-0 py-8"
               >
                 <div 
                   className={`relative flex items-center justify-center transition-all duration-500 ease-in-out ${
                     isActive 
-                      ? "scale-[1.8] grayscale-0 opacity-100 z-20" 
+                      ? "scale-[1.5] grayscale-0 opacity-100 z-20" 
                       : "scale-100 grayscale opacity-40 hover:opacity-60 z-10"
                   }`}
                 >
@@ -88,7 +91,7 @@ export function BrandsStrip() {
                   <img 
                     src={brand.logo} 
                     alt={brand.name} 
-                    className="object-contain w-32 h-16"
+                    className="object-contain w-48 h-24 md:w-56 md:h-28"
                     loading="lazy"
                   />
                 </div>

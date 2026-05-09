@@ -8,7 +8,10 @@ export function LocateUs() {
   const longitude = 77.4081356;
 
   return (
-    <section className="bg-white border-t-2 border-b-2 border-black relative z-10 flex flex-col w-full">
+    <section className="bg-white border-t-2 border-b-2 border-black relative z-10 flex flex-col w-full overflow-hidden">
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[15vw] font-black opacity-[0.03] uppercase tracking-tighter whitespace-nowrap z-0 pointer-events-none text-black">
+        LOCATION
+      </div>
       <div className="p-8 md:p-12 border-b-2 border-black text-center bg-black text-white">
         <h2 className="text-4xl md:text-5xl font-black uppercase tracking-tight">LOCATE US</h2>
       </div>
