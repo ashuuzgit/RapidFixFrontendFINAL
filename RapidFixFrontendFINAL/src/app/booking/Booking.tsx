@@ -686,7 +686,7 @@ export default function Booking() {
                     <p className="text-[var(--color-grey-800)]">Choose the best plan for your {vehicleType?.toLowerCase()}.</p>
                   </div>
                   
-                  {vehicleType === "Bike" && (
+                  {vehicleType === "Bike" && engineType !== "Electric" && (
                     <div className="bg-[var(--color-grey-100)] p-4 border-2 border-[var(--color-black)] mb-6">
                       <label className="block text-xs font-black uppercase tracking-widest mb-2">Select Engine CC</label>
                       <div className="grid grid-cols-3 gap-2">

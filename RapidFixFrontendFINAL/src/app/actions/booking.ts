@@ -2,6 +2,8 @@
 
 export async function submitBooking(data: { 
   vehicleType: string, 
+  engineType?: string,
+  bikeCC?: string,
   brand: string,
   model: string,
   serviceType: string, 

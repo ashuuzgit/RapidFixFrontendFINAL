@@ -20,7 +20,9 @@ import {
   CheckCircle2,
   Loader2,
   ChevronRight,
-  Wrench
+  Wrench,
+  CreditCard,
+  Banknote
 } from "lucide-react"
 
 import { submitBooking } from "@/app/actions/booking"
@@ -84,6 +86,8 @@ export default function CheckoutPage() {
     try {
       const result = await submitBooking({
         vehicleType: vehicleType!,
+        engineType: engineType || undefined,
+        bikeCC: (vehicleType === 'Bike' && engineType !== 'Electric') ? bikeCC || undefined : undefined,
         brand: brand!,
         model: model!,
         serviceType: serviceType!,
@@ -93,7 +97,7 @@ export default function CheckoutPage() {
         address,
         contact,
         problem,
-        paymentMethod: paymentMethod || 'later'
+        paymentMethod: paymentMethod!
       })
 
       if (result.success) {
@@ -335,7 +339,57 @@ export default function CheckoutPage() {
               </Card>
             </div>
 
-            {/* Payment options hidden for now as per user request */}
+            {/* Payment Method */}
+            <Card className="border-2 border-[var(--color-black)] shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] rounded-none overflow-hidden bg-white">
+              <div className="bg-[var(--color-black)] p-5 text-white flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <CreditCard className="w-5 h-5 text-[var(--color-primary)]" />
+                  <h2 className="font-black uppercase tracking-[0.2em] text-sm">Payment Method</h2>
+                </div>
+                <div className="text-[10px] font-bold text-[var(--color-grey-400)] uppercase">Step 04</div>
+              </div>
+              <div className="p-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div 
+                    onClick={() => setPaymentMethod('now')}
+                    className={`p-6 border-2 cursor-pointer transition-all flex flex-col gap-3 group relative overflow-hidden ${
+                      paymentMethod === 'now' 
+                        ? "border-[var(--color-primary)] bg-[var(--color-primary)] text-white" 
+                        : "border-[var(--color-grey-200)] hover:border-[var(--color-black)] bg-white text-black"
+                    }`}
+                  >
+                    <div className="flex items-center justify-between relative z-10">
+                      <CreditCard className={`w-8 h-8 ${paymentMethod === 'now' ? 'text-white' : 'text-[var(--color-primary)]'}`} />
+                      {paymentMethod === 'now' && <CheckCircle2 className="w-5 h-5 text-white" />}
+                    </div>
+                    <div className="relative z-10">
+                      <h3 className="font-black uppercase tracking-wider text-lg">Pay Now</h3>
+                      <p className={`text-[10px] font-bold uppercase tracking-widest ${paymentMethod === 'now' ? 'text-white/80' : 'text-[var(--color-grey-500)]'}`}>Online Payment</p>
+                    </div>
+                    <div className="absolute inset-0 bg-white/10 translate-y-full group-hover:translate-y-0 transition-transform duration-500 skew-y-12 origin-bottom"></div>
+                  </div>
+
+                  <div 
+                    onClick={() => setPaymentMethod('later')}
+                    className={`p-6 border-2 cursor-pointer transition-all flex flex-col gap-3 group relative overflow-hidden ${
+                      paymentMethod === 'later' 
+                        ? "border-[var(--color-primary)] bg-[var(--color-primary)] text-white" 
+                        : "border-[var(--color-grey-200)] hover:border-[var(--color-black)] bg-white text-black"
+                    }`}
+                  >
+                    <div className="flex items-center justify-between relative z-10">
+                      <Banknote className={`w-8 h-8 ${paymentMethod === 'later' ? 'text-white' : 'text-[var(--color-primary)]'}`} />
+                      {paymentMethod === 'later' && <CheckCircle2 className="w-5 h-5 text-white" />}
+                    </div>
+                    <div className="relative z-10">
+                      <h3 className="font-black uppercase tracking-wider text-lg">Pay Later</h3>
+                      <p className={`text-[10px] font-bold uppercase tracking-widest ${paymentMethod === 'later' ? 'text-white/80' : 'text-[var(--color-grey-500)]'}`}>After Service</p>
+                    </div>
+                    <div className="absolute inset-0 bg-white/10 translate-y-full group-hover:translate-y-0 transition-transform duration-500 skew-y-12 origin-bottom"></div>
+                  </div>
+                </div>
+              </div>
+            </Card>
           </div>
 
           {/* Sidebar Summary */}
@@ -355,7 +409,7 @@ export default function CheckoutPage() {
                     <div className="text-right">
                       <span className="font-black uppercase text-sm leading-tight block">{brand} {model}</span>
                       <span className="text-[10px] font-bold text-[var(--color-grey-500)] uppercase block mt-1">
-                        {engineType} • {vehicleType === 'Bike' ? `${bikeCC} CC` : 'Car'}
+                        {engineType} {vehicleType === 'Bike' && engineType !== 'Electric' ? `• ${bikeCC} CC` : (vehicleType === 'Car' ? '• Car' : '')}
                       </span>
                     </div>
                   </div>
@@ -385,7 +439,7 @@ export default function CheckoutPage() {
 
               <Button 
                 className="w-full h-20 text-xl font-black uppercase tracking-[0.2em] shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] rounded-none group relative overflow-hidden"
-                disabled={isSubmitting || !isVerified || !location || !address.flat || !date}
+                disabled={isSubmitting || !isVerified || !location || !address.flat || !date || !paymentMethod}
                 onClick={handleSubmit}
               >
                 <div className="relative z-10 flex items-center justify-center gap-3">
