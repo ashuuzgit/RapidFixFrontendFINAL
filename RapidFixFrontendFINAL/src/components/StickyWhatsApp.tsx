@@ -33,12 +33,12 @@ export function StickyWhatsApp() {
       href="https://wa.me/919667891434"
       target="_blank"
       rel="noopener noreferrer"
-      className={`fixed bottom-8 right-8 z-50 bg-[#25D366] text-white p-4 rounded-full shadow-xl hover:scale-110 transition-all duration-300 ${
+      className={`fixed bottom-8 right-8 z-50 hover:scale-110 transition-all duration-300 drop-shadow-2xl ${
         isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10 pointer-events-none"
       }`}
       aria-label="Chat with us on WhatsApp"
     >
-      <MessageCircle size={32} />
+      <img src="/WA.svg" alt="WhatsApp" className="w-18 h-18 md:w-18 md:h-18 object-contain" />
     </a>
   )
 }

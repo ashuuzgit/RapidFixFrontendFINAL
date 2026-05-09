@@ -10,40 +10,48 @@ export function LeadPopup() {
   const [phoneNumber, setPhoneNumber] = useState("")
 
   useEffect(() => {
-    // Show popup after 3 seconds of page load
-    const timer = setTimeout(() => {
-      setIsOpen(true)
-    }, 3000)
+    // Check if the popup has already been shown in this session
+    const hasBeenShown = sessionStorage.getItem("leadPopupShown")
+    
+    if (!hasBeenShown) {
+      // Show popup after 3 seconds of page load
+      const timer = setTimeout(() => {
+        setIsOpen(true)
+        sessionStorage.setItem("leadPopupShown", "true")
+      }, 3000)
 
-    return () => clearTimeout(timer)
+      return () => clearTimeout(timer)
+    }
   }, [])
 
   if (!isOpen) return null
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-300">
-      <div className="relative bg-white dark:bg-zinc-950 rounded-2xl overflow-y-auto shadow-2xl max-w-3xl w-full flex flex-col md:flex-row animate-in zoom-in-95 duration-500 max-h-[90vh]">
+      <div className="relative bg-white dark:bg-zinc-950 rounded-2xl overflow-hidden shadow-2xl max-w-4xl w-full flex flex-col md:flex-row animate-in zoom-in-95 duration-500 max-h-[95vh] md:max-h-[85vh]">
         
         {/* Close button */}
         <button 
           onClick={() => setIsOpen(false)}
-          className="absolute top-4 right-4 z-10 size-8 flex items-center justify-center rounded-full bg-black text-white hover:scale-110 transition-transform shadow-md"
+          className="absolute top-4 right-4 z-20 size-8 flex items-center justify-center rounded-full bg-black text-white hover:scale-110 transition-transform shadow-md"
         >
           <X className="size-4" />
         </button>
 
         {/* Image Section */}
-        <div className="relative h-64 md:h-auto md:w-5/12 bg-zinc-100 dark:bg-zinc-900">
+        <div className="relative h-48 sm:h-64 md:h-auto md:w-1/2 bg-zinc-100 dark:bg-zinc-900 overflow-hidden">
           <Image 
-            src="https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?q=80&w=2070&auto=format&fit=crop" 
+            src="/LeadPopupImage.webp" 
             alt="Real-time doorstep repairs" 
             fill
-            className="object-cover"
+            className="object-cover md:object-center"
+            priority
           />
+          {/* Mobile Overlay for better text readability if needed, but here it's a separate section */}
         </div>
 
         {/* Content Section */}
-        <div className="p-8 md:p-10 md:w-7/12 flex flex-col justify-center relative">
+        <div className="p-8 md:p-10 md:w-1/2 flex flex-col justify-center relative">
           <div className="flex items-center gap-3 mb-4">
             <Image src="/logo.png" alt="RapidFix Logo" width={32} height={32} className="object-contain" />
             <span className="font-bold text-xl tracking-tight text-zinc-900 dark:text-zinc-50">RAPID<span className="text-[#ff2020]">FIX</span></span>
