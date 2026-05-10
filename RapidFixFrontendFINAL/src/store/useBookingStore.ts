@@ -116,13 +116,13 @@ export const useBookingStore = create<BookingState>()(
             if (bikeCC === "0 - 150") return 799;
             if (bikeCC === "150 - 250") return 899;
             if (bikeCC === "250 - 400") return 999;
-            if (bikeCC === "450 - 650") return 1299;
+            if (bikeCC === "450 - 650") return 1099;
           }
           if (serviceType === "General Service with Engine Oil") {
             if (bikeCC === "0 - 150") return 1249;
             if (bikeCC === "150 - 250") return 1349;
             if (bikeCC === "250 - 400") return 2549;
-            if (bikeCC === "450 - 650") return 3199;
+            if (bikeCC === "450 - 650") return 2649;
           }
           if (serviceType === "Jumpstart") return 450;
           if (serviceType === "Puncture") return 600;
