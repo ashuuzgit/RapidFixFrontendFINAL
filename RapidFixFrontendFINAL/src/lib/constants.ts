@@ -4,7 +4,7 @@ import type {
   BillStatus,
   LeadStatus,
   NavItem,
-   Page,
+  Page,
 } from "./types";
 
 // ── Design tokens ─────────────────────────────────────────────────────────────
@@ -72,6 +72,12 @@ export const BOOKING_STATUS_CFG: Record<
     dot: "#3b82f6",
     label: "Confirmed",
   },
+  converted: {
+    bg: "#f0fdf4",
+    text: "#065f46",
+    dot: "#10b981",
+    label: "Converted",
+  },
   arrived: { bg: "#f0fdf4", text: "#065f46", dot: "#10b981", label: "Arrived" },
   cancelled: {
     bg: "#fef2f2",
@@ -129,7 +135,6 @@ export const JOB_STATUS_ORDER: JobStatus[] = [
 ];
 
 // ── Navigation ────────────────────────────────────────────────────────────────
-
 
 export const NAV: NavItem[] = [
   {

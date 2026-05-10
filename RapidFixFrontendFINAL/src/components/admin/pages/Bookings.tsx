@@ -1,8 +1,22 @@
 "use client";
 import { useState, useEffect } from "react";
 import { C, BOOKING_STATUS_CFG, BOOKING_SOURCE_CFG } from "@/lib/constants";
-import { bookingsApi } from "@/lib/api";
+import { bookingsApi, jobsApi } from "@/lib/api";
 import type { Booking, BookingStatus, Column } from "@/lib/types";
+
+// ── Responsive hook ───────────────────────────────────────────────────────────
+
+function useWindowWidth() {
+  const [width, setWidth] = useState(
+    typeof window !== "undefined" ? window.innerWidth : 1024,
+  );
+  useEffect(() => {
+    const handler = () => setWidth(window.innerWidth);
+    window.addEventListener("resize", handler);
+    return () => window.removeEventListener("resize", handler);
+  }, []);
+  return width;
+}
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -27,10 +41,6 @@ function formatSlot(iso: string | null) {
   });
 }
 
-function todayISO() {
-  return new Date().toISOString().split("T")[0];
-}
-
 // ── Status Badge ──────────────────────────────────────────────────────────────
 
 function StatusBadge({ status }: { status: BookingStatus }) {
@@ -47,6 +57,7 @@ function StatusBadge({ status }: { status: BookingStatus }) {
         color: cfg.text,
         fontSize: 11,
         fontWeight: 500,
+        whiteSpace: "nowrap",
       }}
     >
       <span
@@ -55,6 +66,7 @@ function StatusBadge({ status }: { status: BookingStatus }) {
           height: 6,
           borderRadius: "50%",
           background: cfg.dot,
+          flexShrink: 0,
         }}
       />
       {cfg.label}
@@ -85,6 +97,7 @@ function SourceChip({ source }: { source: string }) {
         fontSize: 11,
         fontWeight: 500,
         textTransform: "capitalize",
+        whiteSpace: "nowrap",
       }}
     >
       <i
@@ -101,9 +114,14 @@ function SourceChip({ source }: { source: string }) {
 interface AddBookingModalProps {
   onClose: () => void;
   onCreated: (b: Booking) => void;
+  isMobile: boolean;
 }
 
-function AddBookingModal({ onClose, onCreated }: AddBookingModalProps) {
+function AddBookingModal({
+  onClose,
+  onCreated,
+  isMobile,
+}: AddBookingModalProps) {
   const [form, setForm] = useState({
     customer_id: "",
     source: "phone",
@@ -157,6 +175,32 @@ function AddBookingModal({ onClose, onCreated }: AddBookingModalProps) {
     }
   }
 
+  // Mobile: slide-up sheet; Desktop: centred modal
+  const panelStyle: React.CSSProperties = isMobile
+    ? {
+        position: "fixed",
+        bottom: 0,
+        left: 0,
+        right: 0,
+        zIndex: 51,
+        background: C.surface,
+        borderRadius: "12px 12px 0 0",
+        border: `1px solid ${C.border}`,
+        borderBottom: "none",
+        padding: "20px 16px 32px",
+        boxShadow: "0 -4px 24px rgba(0,0,0,0.12)",
+        maxHeight: "90dvh",
+        overflowY: "auto",
+      }
+    : {
+        background: C.surface,
+        borderRadius: 6,
+        border: `1px solid ${C.border}`,
+        width: 440,
+        padding: 24,
+        boxShadow: "0 8px 32px rgba(0,0,0,0.12)",
+      };
+
   return (
     <div
       style={{
@@ -165,23 +209,27 @@ function AddBookingModal({ onClose, onCreated }: AddBookingModalProps) {
         zIndex: 50,
         background: "rgba(0,0,0,0.4)",
         display: "flex",
-        alignItems: "center",
+        alignItems: isMobile ? "flex-end" : "center",
         justifyContent: "center",
       }}
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      <div
-        style={{
-          background: C.surface,
-          borderRadius: 6,
-          border: `1px solid ${C.border}`,
-          width: 440,
-          padding: 24,
-          boxShadow: "0 8px 32px rgba(0,0,0,0.12)",
-        }}
-      >
+      <div style={panelStyle}>
+        {/* Drag handle on mobile */}
+        {isMobile && (
+          <div
+            style={{
+              width: 36,
+              height: 4,
+              borderRadius: 99,
+              background: C.border,
+              margin: "0 auto 16px",
+            }}
+          />
+        )}
+
         <div
           style={{
             display: "flex",
@@ -293,6 +341,7 @@ function AddBookingModal({ onClose, onCreated }: AddBookingModalProps) {
             onClick={submit}
             disabled={saving}
             style={{
+              flex: isMobile ? 1 : undefined,
               padding: "7px 16px",
               borderRadius: 4,
               fontSize: 13,
@@ -317,10 +366,12 @@ interface DrawerProps {
   booking: Booking;
   onClose: () => void;
   onUpdated: (b: Booking) => void;
+  isMobile: boolean;
 }
 
-function BookingDrawer({ booking, onClose, onUpdated }: DrawerProps) {
+function BookingDrawer({ booking, onClose, onUpdated, isMobile }: DrawerProps) {
   const [confirming, setConfirming] = useState(false);
+  const [converting, setConverting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   async function confirm() {
@@ -328,12 +379,31 @@ function BookingDrawer({ booking, onClose, onUpdated }: DrawerProps) {
     setError(null);
     try {
       await bookingsApi.confirm(booking.id);
-      // patch status locally
-      onUpdated({ ...booking, status: "confirmed" });
+      onUpdated({ ...booking, status: "converted" });
     } catch (e: any) {
       setError(e?.error ?? "Failed to confirm");
     } finally {
       setConfirming(false);
+    }
+  }
+
+  async function convertToJob() {
+    setConverting(true);
+    setError(null);
+    try {
+      await jobsApi.create({
+        booking_id: booking.id,
+        customer_id: booking.customers!.id,
+        vehicle_id: booking.vehicles?.id ?? undefined,
+        service_description: booking.service_notes ?? undefined,
+        estimated_completion: booking.slot_at ?? undefined,
+      });
+      onUpdated({ ...booking, status: "arrived" });
+      onClose();
+    } catch (e: any) {
+      setError(e?.error ?? "Failed to convert to job");
+    } finally {
+      setConverting(false);
     }
   }
 
@@ -356,8 +426,43 @@ function BookingDrawer({ booking, onClose, onUpdated }: DrawerProps) {
     </div>
   );
 
+  const vehicleLabel = booking.vehicles
+    ? `${booking.vehicles.make ?? ""} ${booking.vehicles.model ?? ""}${booking.vehicles.registration ? " · " + booking.vehicles.registration : ""}`.trim()
+    : null;
+
+  // Mobile: bottom sheet; Desktop: right-side drawer
+  const drawerStyle: React.CSSProperties = isMobile
+    ? {
+        position: "fixed",
+        bottom: 0,
+        left: 0,
+        right: 0,
+        zIndex: 41,
+        background: C.surface,
+        borderRadius: "12px 12px 0 0",
+        borderTop: `1px solid ${C.border}`,
+        display: "flex",
+        flexDirection: "column",
+        maxHeight: "85dvh",
+        boxShadow: "0 -4px 24px rgba(0,0,0,0.1)",
+      }
+    : {
+        position: "fixed",
+        top: 0,
+        right: 0,
+        bottom: 0,
+        width: 360,
+        zIndex: 41,
+        background: C.surface,
+        borderLeft: `1px solid ${C.border}`,
+        display: "flex",
+        flexDirection: "column",
+        boxShadow: "-4px 0 24px rgba(0,0,0,0.08)",
+      };
+
   return (
     <>
+      {/* Backdrop */}
       <div
         style={{
           position: "fixed",
@@ -367,29 +472,32 @@ function BookingDrawer({ booking, onClose, onUpdated }: DrawerProps) {
         }}
         onClick={onClose}
       />
-      <div
-        style={{
-          position: "fixed",
-          top: 0,
-          right: 0,
-          bottom: 0,
-          width: 360,
-          zIndex: 41,
-          background: C.surface,
-          borderLeft: `1px solid ${C.border}`,
-          display: "flex",
-          flexDirection: "column",
-          boxShadow: "-4px 0 24px rgba(0,0,0,0.08)",
-        }}
-      >
+
+      {/* Drawer / Sheet */}
+      <div style={drawerStyle}>
+        {/* Drag handle (mobile only) */}
+        {isMobile && (
+          <div
+            style={{
+              width: 36,
+              height: 4,
+              borderRadius: 99,
+              background: C.border,
+              margin: "12px auto 0",
+              flexShrink: 0,
+            }}
+          />
+        )}
+
         {/* Header */}
         <div
           style={{
-            padding: "16px 20px",
+            padding: isMobile ? "12px 16px" : "16px 20px",
             borderBottom: `1px solid ${C.border}`,
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
+            flexShrink: 0,
           }}
         >
           <span style={{ fontWeight: 600, fontSize: 14, color: C.text }}>
@@ -412,11 +520,12 @@ function BookingDrawer({ booking, onClose, onUpdated }: DrawerProps) {
         {/* ID + status */}
         <div
           style={{
-            padding: "16px 20px",
-            borderBottom: `1px solid ${C.borderFaint}`,
+            padding: isMobile ? "12px 16px" : "16px 20px",
+            borderBottom: `1px solid ${C.border}`,
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
+            flexShrink: 0,
           }}
         >
           <Mono v={booking.id} />
@@ -424,16 +533,18 @@ function BookingDrawer({ booking, onClose, onUpdated }: DrawerProps) {
         </div>
 
         {/* Body */}
-        <div style={{ flex: 1, overflowY: "auto", padding: 20 }}>
+        <div
+          style={{
+            flex: 1,
+            overflowY: "auto",
+            padding: isMobile ? "16px 16px" : 20,
+          }}
+        >
           {fieldRow("Customer", booking.customers?.name ?? "—")}
           {fieldRow("Phone", <Mono v={booking.customers?.phone ?? "—"} />)}
           {fieldRow(
             "Vehicle",
-            booking.vehicles ? (
-              `${booking.vehicles.make ?? ""} ${booking.vehicles.model ?? ""} · ${booking.vehicles.registration ?? ""}`.trim()
-            ) : (
-              <span style={{ color: C.textMuted }}>—</span>
-            ),
+            vehicleLabel ?? <span style={{ color: C.textMuted }}>—</span>,
           )}
           {fieldRow("Slot", formatSlot(booking.slot_at))}
           {fieldRow("Source", <SourceChip source={booking.source} />)}
@@ -476,11 +587,12 @@ function BookingDrawer({ booking, onClose, onUpdated }: DrawerProps) {
         {/* Footer */}
         <div
           style={{
-            padding: "14px 20px",
+            padding: isMobile ? "12px 16px 24px" : "14px 20px",
             borderTop: `1px solid ${C.border}`,
             display: "flex",
             gap: 8,
             justifyContent: "flex-end",
+            flexShrink: 0,
           }}
         >
           {booking.status === "pending" && (
@@ -488,6 +600,7 @@ function BookingDrawer({ booking, onClose, onUpdated }: DrawerProps) {
               onClick={confirm}
               disabled={confirming}
               style={{
+                flex: isMobile ? 1 : undefined,
                 padding: "7px 16px",
                 borderRadius: 4,
                 fontSize: 13,
@@ -499,6 +612,26 @@ function BookingDrawer({ booking, onClose, onUpdated }: DrawerProps) {
               }}
             >
               {confirming ? "Confirming…" : "✓ Confirm Booking"}
+            </button>
+          )}
+
+          {booking.status === "confirmed" && (
+            <button
+              onClick={convertToJob}
+              disabled={converting}
+              style={{
+                flex: isMobile ? 1 : undefined,
+                padding: "7px 16px",
+                borderRadius: 4,
+                fontSize: 13,
+                background: converting ? C.textMuted : C.accent,
+                border: "none",
+                color: "#fff",
+                cursor: converting ? "not-allowed" : "pointer",
+                fontWeight: 600,
+              }}
+            >
+              {converting ? "Creating Job…" : "→ Convert to Job"}
             </button>
           )}
         </div>
@@ -513,20 +646,106 @@ const FILTERS: { label: string; value: string }[] = [
   { label: "All", value: "" },
   { label: "Pending", value: "pending" },
   { label: "Confirmed", value: "confirmed" },
+  { label: "Converted", value: "converted" },
   { label: "Arrived", value: "arrived" },
   { label: "Cancelled", value: "cancelled" },
 ];
 
+// ── Booking Card (mobile) ─────────────────────────────────────────────────────
+
+function BookingCard({
+  booking,
+  onClick,
+}: {
+  booking: Booking;
+  onClick: () => void;
+}) {
+  return (
+    <div
+      onClick={onClick}
+      style={{
+        padding: "12px 14px",
+        borderBottom: `1px solid ${C.borderFaint}`,
+        cursor: "pointer",
+        display: "flex",
+        flexDirection: "column",
+        gap: 8,
+        background: "transparent",
+        transition: "background 0.1s",
+      }}
+      onTouchStart={(e) => (e.currentTarget.style.background = C.bg)}
+      onTouchEnd={(e) => (e.currentTarget.style.background = "transparent")}
+    >
+      {/* Row 1: name + status */}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          gap: 8,
+        }}
+      >
+        <span style={{ fontWeight: 600, fontSize: 14, color: C.text }}>
+          {booking.customers?.name ?? "—"}
+        </span>
+        <StatusBadge status={booking.status} />
+      </div>
+
+      {/* Row 2: phone + slot */}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          gap: 8,
+        }}
+      >
+        <Mono v={booking.customers?.phone ?? "—"} />
+        <Muted v={formatSlot(booking.slot_at)} />
+      </div>
+
+      {/* Row 3: service + source */}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          gap: 8,
+        }}
+      >
+        <span
+          style={{
+            fontSize: 12,
+            color: C.textSec,
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+            flex: 1,
+          }}
+        >
+          {booking.service_notes ?? (
+            <span style={{ color: C.textMuted }}>No notes</span>
+          )}
+        </span>
+        <SourceChip source={booking.source} />
+      </div>
+    </div>
+  );
+}
+
 // ── Main Component ────────────────────────────────────────────────────────────
 
 export function Bookings() {
+  const width = useWindowWidth();
+  const isMobile = width < 640;
+
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState("");
-  const [date, setDate] = useState(todayISO());
+  const [date, setDate] = useState("");
   const [showAdd, setShowAdd] = useState(false);
   const [selected, setSelected] = useState<Booking | null>(null);
 
@@ -608,59 +827,77 @@ export function Bookings() {
       <div
         style={{
           display: "flex",
-          alignItems: "center",
+          flexDirection: isMobile ? "column" : "row",
+          alignItems: isMobile ? "stretch" : "center",
           justifyContent: "space-between",
           marginBottom: 14,
-          gap: 12,
-          flexWrap: "wrap",
+          gap: isMobile ? 10 : 12,
         }}
       >
-        {/* Filter tabs */}
+        {/* Filter tabs — horizontally scrollable on mobile */}
+        <div
+          style={{
+            overflowX: "auto",
+            WebkitOverflowScrolling: "touch",
+            scrollbarWidth: "none",
+          }}
+        >
+          <div
+            style={{
+              display: "inline-flex",
+              gap: 2,
+              background: C.bg,
+              border: `1px solid ${C.border}`,
+              borderRadius: 4,
+              padding: 3,
+              minWidth: "max-content",
+            }}
+          >
+            {FILTERS.map((f) => (
+              <button
+                key={f.value}
+                onClick={() => setStatusFilter(f.value)}
+                style={{
+                  padding: isMobile ? "5px 10px" : "5px 12px",
+                  borderRadius: 3,
+                  fontSize: 12,
+                  fontWeight: 500,
+                  background:
+                    statusFilter === f.value ? C.surface : "transparent",
+                  border:
+                    statusFilter === f.value
+                      ? `1px solid ${C.border}`
+                      : "1px solid transparent",
+                  color: statusFilter === f.value ? C.text : C.textSec,
+                  cursor: "pointer",
+                  boxShadow:
+                    statusFilter === f.value
+                      ? "0 1px 3px rgba(0,0,0,0.06)"
+                      : "none",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {f.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Date + count + button */}
         <div
           style={{
             display: "flex",
-            gap: 2,
-            background: C.bg,
-            border: `1px solid ${C.border}`,
-            borderRadius: 4,
-            padding: 3,
+            alignItems: "center",
+            gap: 8,
+            justifyContent: isMobile ? "space-between" : "flex-end",
           }}
         >
-          {FILTERS.map((f) => (
-            <button
-              key={f.value}
-              onClick={() => setStatusFilter(f.value)}
-              style={{
-                padding: "5px 12px",
-                borderRadius: 3,
-                fontSize: 12,
-                fontWeight: 500,
-                background:
-                  statusFilter === f.value ? C.surface : "transparent",
-                border:
-                  statusFilter === f.value
-                    ? `1px solid ${C.border}`
-                    : "1px solid transparent",
-                color: statusFilter === f.value ? C.text : C.textSec,
-                cursor: "pointer",
-                boxShadow:
-                  statusFilter === f.value
-                    ? "0 1px 3px rgba(0,0,0,0.06)"
-                    : "none",
-              }}
-            >
-              {f.label}
-            </button>
-          ))}
-        </div>
-
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          {/* Date picker */}
           <input
             type="date"
             value={date}
             onChange={(e) => setDate(e.target.value)}
             style={{
+              flex: isMobile ? 1 : undefined,
               padding: "6px 10px",
               borderRadius: 4,
               fontSize: 13,
@@ -669,22 +906,27 @@ export function Bookings() {
               color: C.text,
               outline: "none",
               cursor: "pointer",
+              minWidth: 0,
             }}
           />
-          {/* Count */}
           {!loading && (
-            <span style={{ fontSize: 12, color: C.textSec }}>
+            <span
+              style={{
+                fontSize: 12,
+                color: C.textSec,
+                whiteSpace: "nowrap",
+              }}
+            >
               {total} booking{total !== 1 ? "s" : ""}
             </span>
           )}
-          {/* Add */}
           <button
             onClick={() => setShowAdd(true)}
             style={{
               display: "flex",
               alignItems: "center",
               gap: 6,
-              padding: "7px 14px",
+              padding: isMobile ? "7px 12px" : "7px 14px",
               borderRadius: 4,
               background: C.accent,
               border: "none",
@@ -692,10 +934,11 @@ export function Bookings() {
               fontSize: 13,
               fontWeight: 600,
               cursor: "pointer",
+              whiteSpace: "nowrap",
             }}
           >
             <i className="ti ti-plus" style={{ fontSize: 14 }} />
-            New Booking
+            {isMobile ? "New" : "New Booking"}
           </button>
         </div>
       </div>
@@ -732,7 +975,7 @@ export function Bookings() {
         </div>
       )}
 
-      {/* Table */}
+      {/* Table / Card list */}
       <div
         style={{
           background: C.surface,
@@ -742,6 +985,7 @@ export function Bookings() {
         }}
       >
         {loading ? (
+          // Skeleton
           <div>
             {Array.from({ length: 7 }).map((_, i) => (
               <div
@@ -753,7 +997,10 @@ export function Bookings() {
                   borderBottom: `1px solid ${C.borderFaint}`,
                 }}
               >
-                {[90, 140, 120, 140, 130, 70, 80].map((w, j) => (
+                {(isMobile
+                  ? [140, 80, 100]
+                  : [90, 140, 120, 140, 130, 70, 80]
+                ).map((w, j) => (
                   <div
                     key={j}
                     style={{
@@ -762,6 +1009,7 @@ export function Bookings() {
                       background: C.borderFaint,
                       width: w,
                       animation: "pulse 1.5s ease-in-out infinite",
+                      flexShrink: 0,
                     }}
                   />
                 ))}
@@ -786,9 +1034,20 @@ export function Bookings() {
               ? `for ${new Date(date + "T00:00:00").toLocaleDateString("en-IN", { day: "2-digit", month: "short" })}`
               : "found"}
           </div>
+        ) : isMobile ? (
+          // ── Mobile: card list ──
+          <div>
+            {bookings.map((booking) => (
+              <BookingCard
+                key={booking.id}
+                booking={booking}
+                onClick={() => setSelected(booking)}
+              />
+            ))}
+          </div>
         ) : (
+          // ── Desktop: table ──
           <>
-            {/* Header */}
             <div
               style={{
                 display: "grid",
@@ -814,7 +1073,6 @@ export function Bookings() {
               ))}
             </div>
 
-            {/* Rows */}
             {bookings.map((booking) => (
               <div
                 key={booking.id}
@@ -852,15 +1110,12 @@ export function Bookings() {
         <div
           style={{
             display: "flex",
-            justifyContent: "flex-end",
+            justifyContent: "space-between",
             alignItems: "center",
             gap: 8,
             marginTop: 12,
           }}
         >
-          <span style={{ fontSize: 12, color: C.textSec }}>
-            Page {page} of {totalPages}
-          </span>
           <button
             disabled={page === 1}
             onClick={() => setPage((p) => p - 1)}
@@ -876,6 +1131,9 @@ export function Bookings() {
           >
             ← Prev
           </button>
+          <span style={{ fontSize: 12, color: C.textSec }}>
+            {page} / {totalPages}
+          </span>
           <button
             disabled={page === totalPages}
             onClick={() => setPage((p) => p + 1)}
@@ -898,6 +1156,7 @@ export function Bookings() {
       {showAdd && (
         <AddBookingModal
           onClose={() => setShowAdd(false)}
+          isMobile={isMobile}
           onCreated={(b) => {
             setBookings((prev) => [b, ...prev]);
             setTotal((t) => t + 1);
@@ -909,6 +1168,7 @@ export function Bookings() {
       {selected && (
         <BookingDrawer
           booking={selected}
+          isMobile={isMobile}
           onClose={() => setSelected(null)}
           onUpdated={(updated) => {
             setBookings((prev) =>
@@ -923,6 +1183,9 @@ export function Bookings() {
         @keyframes pulse {
           0%, 100% { opacity: 1; }
           50% { opacity: 0.4; }
+        }
+        ::-webkit-scrollbar {
+          display: none;
         }
       `}</style>
     </div>

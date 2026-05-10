@@ -11,6 +11,7 @@ import customers from './routes/customers';
 import vehicles from './routes/vehicles';
 import leads from './routes/leads';
 import webhook from './routes/webhook';
+import pub from './routes/Public';
 import notify from './routes/notify';
 // add import at the top with the others
 import staff from './routes/staff';
@@ -40,6 +41,7 @@ app.route('/customers', customers);
 app.route('/vehicles', vehicles);
 app.route('/leads', leads);
 app.route('/webhook', webhook);
+app.route('/public', pub);
 app.route('/notify', notify);
 
 app.get('/', (c) => c.json({ status: 'ok', service: 'repaiross-api' }));

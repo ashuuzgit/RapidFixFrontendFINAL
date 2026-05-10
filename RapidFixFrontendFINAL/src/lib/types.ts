@@ -105,7 +105,12 @@ export interface JobDetail extends Job {
 
 // ── Bookings ──────────────────────────────────────────────────────────────────
 
-export type BookingStatus = "pending" | "confirmed" | "arrived" | "cancelled";
+export type BookingStatus =
+  | "pending"
+  | "confirmed"
+  | "arrived"
+  | "cancelled"
+  | "converted";
 export type BookingSource = "online" | "whatsapp" | "phone" | "walkin";
 
 export interface Booking {
