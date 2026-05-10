@@ -9,6 +9,5 @@
 
 	"vars": {
 		"SUPABASE_URL": "https://myoejvzylswkqpfxxcay.supabase.co",
-		"FAST2SMS_API_KEY": ""
-	}
+	},
 }

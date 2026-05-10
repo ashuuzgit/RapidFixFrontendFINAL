@@ -22,6 +22,7 @@ export function LeadPopup() {
 
   useEffect(() => {
     if (window.location.pathname.startsWith("/admin")) return;
+    if (window.location.pathname.startsWith("/checkout")) return;
     const t = setTimeout(() => setIsOpen(true), 3000);
     return () => clearTimeout(t);
   }, []);
