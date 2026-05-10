@@ -74,18 +74,18 @@ export function LeadPopup() {
           <X className="size-4" />
         </button>
 
-        <div className="relative h-64 md:h-auto md:w-5/12 bg-zinc-100 dark:bg-zinc-900">
+        <div className="relative h-64 md:h-auto md:w-full bg-zinc-100 dark:bg-zinc-900">
           <Image
-            src="https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?q=80&w=2070&auto=format&fit=crop"
+            src="https://images.unsplash.com/photo-1615172282427-9a57ef2d142e?q=80&w=1206&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
             alt="Real-time doorstep repairs"
             fill
-            className="object-cover md:object-center"
+            className="object-cover md:object-center mr-6"
             priority
           />
           {/* Mobile Overlay for better text readability if needed, but here it's a separate section */}
         </div>
 
-        <div className="p-8 md:p-10 md:w-7/12 flex flex-col justify-center">
+        <div className="p-8 md:p-10 md:w-10/12 flex flex-col justify-center">
           <div className="flex items-center gap-3 mb-4">
             <Image
               src="/logo.png"
@@ -107,7 +107,7 @@ export function LeadPopup() {
             <span className="font-semibold text-zinc-900 dark:text-zinc-100">
               30 seconds
             </span>
-            . We come to you—home, office or roadside.
+            . We come to your home, office or even on road with onsite fix.
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-2">
