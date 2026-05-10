@@ -66,6 +66,7 @@ export default function CheckoutPage() {
   const [name, setName] = useState("");
   const [success, setSuccess] = useState(false);
   const [bookingId, setBookingId] = useState("");
+  const [finalEstimate, setFinalEstimate] = useState<number>(0);
   const [mounted, setMounted] = useState(false);
   const [otpSent, setOtpSent] = useState(false);
   const [otpCode, setOtpCode] = useState("");
@@ -94,20 +95,17 @@ export default function CheckoutPage() {
       const data = await res.json();
 
       if (data.found) {
-        // Existing customer — no OTP needed
         setCustomerId(data.customerId);
         setWelcomeName(data.name);
         setIsNewCustomer(false);
         setIsVerified(true);
       } else {
-        // New customer — send OTP, don't verify yet
         await fetch(`${API_URL}/public/otp/send`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ phone: contact }),
         });
         setOtpSent(true);
-        // isVerified stays false until OTP confirmed
       }
     } catch (e) {
       alert("Something went wrong. Please try again.");
@@ -118,6 +116,9 @@ export default function CheckoutPage() {
 
   // ── Submit ────────────────────────────────────────────────────────────────
   const handleSubmit = async () => {
+    const amount = getEstimate();
+    setFinalEstimate(amount);
+
     if (!isVerified) {
       alert("Please verify your contact details first.");
       return;
@@ -152,7 +153,7 @@ export default function CheckoutPage() {
           model,
           serviceType,
           date,
-          estimate: getEstimate(),
+          estimate: amount,
           location,
           address,
           problem,
@@ -204,6 +205,17 @@ export default function CheckoutPage() {
             </p>
             <p className="text-xl font-mono font-black">{bookingId}</p>
           </div>
+
+          {/* ── UPI Payment Button — only for Pay Now ── */}
+          {paymentMethod === "now" && (
+            <a
+              href={`upi://pay?pa=9667891434@ibl&pn=AutoService&am=${finalEstimate}&cu=INR&tn=Booking+${encodeURIComponent(bookingId)}`}
+              className="w-full h-14 mb-4 flex items-center justify-center gap-2 bg-[var(--color-primary)] text-white font-black uppercase tracking-[0.2em] text-sm shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
+            >
+              <CreditCard className="w-5 h-5" /> Pay ₹{finalEstimate} via UPI
+            </a>
+          )}
+
           <Button
             className="w-full"
             onClick={() => {
@@ -551,6 +563,7 @@ export default function CheckoutPage() {
               </div>
               <div className="p-8">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Pay Now */}
                   <div
                     onClick={() => setPaymentMethod("now")}
                     className={`p-6 border-2 cursor-pointer transition-all flex flex-col gap-3 group relative overflow-hidden ${
@@ -572,14 +585,24 @@ export default function CheckoutPage() {
                         Pay Now
                       </h3>
                       <p
-                        className={`text-[10px] font-bold uppercase tracking-widest ${paymentMethod === "now" ? "text-white/80" : "text-[var(--color-grey-500)]"}`}
+                        className={`text-[10px] font-bold uppercase tracking-widest ${
+                          paymentMethod === "now"
+                            ? "text-white/80"
+                            : "text-[var(--color-grey-500)]"
+                        }`}
                       >
-                        Online Payment
+                        UPI • Redirects to App
                       </p>
                     </div>
+                    {paymentMethod === "now" && (
+                      <div className="relative z-10 flex items-center gap-2 text-[10px] font-black uppercase tracking-widest mt-1 text-white/70">
+                        <span className="font-mono">9667891434@ibl</span>
+                      </div>
+                    )}
                     <div className="absolute inset-0 bg-white/10 translate-y-full group-hover:translate-y-0 transition-transform duration-500 skew-y-12 origin-bottom"></div>
                   </div>
 
+                  {/* Pay Later */}
                   <div
                     onClick={() => setPaymentMethod("later")}
                     className={`p-6 border-2 cursor-pointer transition-all flex flex-col gap-3 group relative overflow-hidden ${
@@ -601,7 +624,11 @@ export default function CheckoutPage() {
                         Pay Later
                       </h3>
                       <p
-                        className={`text-[10px] font-bold uppercase tracking-widest ${paymentMethod === "later" ? "text-white/80" : "text-[var(--color-grey-500)]"}`}
+                        className={`text-[10px] font-bold uppercase tracking-widest ${
+                          paymentMethod === "later"
+                            ? "text-white/80"
+                            : "text-[var(--color-grey-500)]"
+                        }`}
                       >
                         After Service
                       </p>

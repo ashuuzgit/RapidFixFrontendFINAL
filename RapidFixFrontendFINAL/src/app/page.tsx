@@ -28,8 +28,8 @@ export default function Home() {
         mediaType="sequence"
         mediaSrc=""
         bgImageSrc="/engine.webp"
-        title="PRECISION ENGINEERING"
-        date="PERFORMANCE"
+        title="RAPIDFIX AUTO"
+        date="Your vehicle deserves the right fix"
       />
 
       {/* Guarantees Bar (Image 2) */}
@@ -120,8 +120,6 @@ export default function Home() {
 
       {/* Statistics Section */}
       <StatisticsStrip />
-
-    
 
       {/* CTA Section */}
       <section className="border-b-2 border-black bg-[var(--color-grey-100)] py-24 relative z-10 overflow-hidden">
