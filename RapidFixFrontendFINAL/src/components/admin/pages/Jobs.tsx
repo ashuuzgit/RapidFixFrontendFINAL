@@ -1,9 +1,11 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { C } from "@/lib/constants";
 import { DataTable } from "../atoms/DataTable";
-import { Badge } from "../atoms/Badge";
+import { jobsApi } from "@/lib/api";
 import type { Role, Job, JobStatus, Column } from "@/lib/types";
+import { NewJobModal } from "../atoms/NewJobModal";
+import { JobStatusBadge } from "../atoms/JobStatusBadge";
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -36,189 +38,79 @@ const FILTER_MAP: Partial<Record<JobFilter, JobStatus>> = {
   Delivered: "delivered",
 };
 
-// ── Seed data ─────────────────────────────────────────────────────────────────
-
-const JOBS: Job[] = [
-  {
-    id: "JOB-1042",
-    status: "in_progress",
-    customers: { id: "1", name: "Rahul Sharma", phone: "+91 98000 11111" },
-    vehicles: {
-      id: "1",
-      make: "Maruti",
-      model: "Alto",
-      registration: "MH12 AB 1234",
-      type: "car",
-    },
-    mechanic: { id: "1", name: "Ramesh K." },
-    service_description: null,
-    estimated_completion: null,
-    odometer_in: null,
-    created_at: "",
-    updated_at: "10 min ago",
-  },
-  {
-    id: "JOB-1041",
-    status: "diagnosed",
-    customers: { id: "2", name: "Priya Desai", phone: "+91 98000 22222" },
-    vehicles: {
-      id: "2",
-      make: "Honda",
-      model: "City",
-      registration: "DL09 CD 5678",
-      type: "car",
-    },
-    mechanic: { id: "2", name: "Suresh P." },
-    service_description: null,
-    estimated_completion: null,
-    odometer_in: null,
-    created_at: "",
-    updated_at: "2 hrs ago",
-  },
-  {
-    id: "JOB-1040",
-    status: "delivered",
-    customers: { id: "3", name: "Amit Verma", phone: "+91 98000 33333" },
-    vehicles: {
-      id: "3",
-      make: "Hyundai",
-      model: "i20",
-      registration: "KA03 EF 9012",
-      type: "car",
-    },
-    mechanic: { id: "1", name: "Ramesh K." },
-    service_description: null,
-    estimated_completion: null,
-    odometer_in: null,
-    created_at: "",
-    updated_at: "Yesterday",
-  },
-  {
-    id: "JOB-1039",
-    status: "received",
-    customers: { id: "4", name: "Neha Gupta", phone: "+91 98000 44444" },
-    vehicles: {
-      id: "4",
-      make: "Toyota",
-      model: "Innova",
-      registration: "MH04 GH 3456",
-      type: "car",
-    },
-    mechanic: null,
-    service_description: null,
-    estimated_completion: null,
-    odometer_in: null,
-    created_at: "",
-    updated_at: "Yesterday",
-  },
-  {
-    id: "JOB-1038",
-    status: "delivered",
-    customers: { id: "5", name: "Sanjay Mehta", phone: "+91 98000 55555" },
-    vehicles: {
-      id: "5",
-      make: "Maruti",
-      model: "Dzire",
-      registration: "GJ01 IJ 7890",
-      type: "car",
-    },
-    mechanic: { id: "3", name: "Vikram S." },
-    service_description: null,
-    estimated_completion: null,
-    odometer_in: null,
-    created_at: "",
-    updated_at: "2 days ago",
-  },
-  {
-    id: "JOB-1037",
-    status: "ready",
-    customers: { id: "6", name: "Deepa Nair", phone: "+91 98000 66666" },
-    vehicles: {
-      id: "6",
-      make: "Maruti",
-      model: "WagonR",
-      registration: "MH02 KL 2345",
-      type: "car",
-    },
-    mechanic: { id: "2", name: "Suresh P." },
-    service_description: null,
-    estimated_completion: null,
-    odometer_in: null,
-    created_at: "",
-    updated_at: "3 hrs ago",
-  },
-  {
-    id: "JOB-1036",
-    status: "received",
-    customers: { id: "7", name: "Arjun Pillai", phone: "+91 98000 77777" },
-    vehicles: {
-      id: "7",
-      make: "Hyundai",
-      model: "Creta",
-      registration: "TN09 MN 6789",
-      type: "car",
-    },
-    mechanic: null,
-    service_description: null,
-    estimated_completion: null,
-    odometer_in: null,
-    created_at: "",
-    updated_at: "3 days ago",
-  },
-];
-
-// ── Columns ───────────────────────────────────────────────────────────────────
-
-const cols: Column<Job>[] = [
-  { key: "id", label: "Job ID", render: (r) => <Mono v={r.id} /> },
-  {
-    key: "customers",
-    label: "Customer",
-    render: (r) => <>{r.customers?.name ?? "—"}</>,
-  },
-  {
-    key: "vehicle_reg",
-    label: "Reg No.",
-    render: (r) => <Mono v={r.vehicles?.registration ?? "—"} />,
-  },
-  {
-    key: "vehicle_model",
-    label: "Model",
-    render: (r) => (
-      <Muted v={`${r.vehicles?.make ?? ""} ${r.vehicles?.model ?? ""}`} />
-    ),
-  },
-  {
-    key: "status",
-    label: "Status",
-    render: (r) => <Badge status={r.status} />,
-  },
-  {
-    key: "mechanic",
-    label: "Mechanic",
-    render: (r) => <>{r.mechanic?.name ?? "Unassigned"}</>,
-  },
-  {
-    key: "updated_at",
-    label: "Updated",
-    render: (r) => <Muted v={r.updated_at} />,
-  },
-];
-
 // ── Component ─────────────────────────────────────────────────────────────────
 
 export function Jobs({ role }: { role: Role }) {
   const [filter, setFilter] = useState<JobFilter>("All");
+  const [jobs, setJobs] = useState<Job[]>([]);
+  const [total, setTotal] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [showNewJob, setShowNewJob] = useState(false);
 
-  const base =
-    role === "mechanic"
-      ? JOBS.filter((j) => j.mechanic?.name === "Ramesh K.")
-      : JOBS;
+  const fetchJobs = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const status = FILTER_MAP[filter];
+      const res = await jobsApi.list({ status, limit: 50 });
+      setJobs(res.data);
+      setTotal(res.total);
+    } catch (e: any) {
+      setError(e?.error ?? "Failed to load jobs");
+    } finally {
+      setLoading(false);
+    }
+  }, [filter]);
 
-  const rows =
-    filter === "All"
-      ? base
-      : base.filter((j) => j.status === FILTER_MAP[filter]);
+  useEffect(() => {
+    fetchJobs();
+  }, [fetchJobs]);
+
+  // ── Columns (inside component so fetchJobs + role are in scope) ──────────────
+
+  const cols: Column<Job>[] = [
+    { key: "id", label: "Job ID", render: (r) => <Mono v={r.id} /> },
+    {
+      key: "customers",
+      label: "Customer",
+      render: (r) => <>{r.customers?.name ?? "—"}</>,
+    },
+    {
+      key: "vehicle_reg",
+      label: "Reg No.",
+      render: (r) => <Mono v={r.vehicles?.registration ?? "—"} />,
+    },
+    {
+      key: "vehicle_model",
+      label: "Model",
+      render: (r) => (
+        <Muted v={`${r.vehicles?.make ?? ""} ${r.vehicles?.model ?? ""}`} />
+      ),
+    },
+    {
+      key: "status",
+      label: "Status",
+      render: (r) => (
+        <JobStatusBadge
+          jobId={r.id}
+          current={r.status}
+          onChanged={fetchJobs}
+          readonly={role === "mechanic"}
+        />
+      ),
+    },
+    {
+      key: "mechanic",
+      label: "Mechanic",
+      render: (r) => <>{r.mechanic?.name ?? "Unassigned"}</>,
+    },
+    {
+      key: "updated_at",
+      label: "Updated",
+      render: (r) => <Muted v={new Date(r.updated_at).toLocaleDateString()} />,
+    },
+  ];
 
   return (
     <div>
@@ -240,6 +132,7 @@ export function Jobs({ role }: { role: Role }) {
             background: "#f0f2f5",
             padding: 2,
             borderRadius: 4,
+            overflow: "visible",
             gap: 1,
             flexWrap: "wrap",
           }}
@@ -266,27 +159,36 @@ export function Jobs({ role }: { role: Role }) {
           ))}
         </div>
 
-        {/* New Job button — owner only */}
         {role === "owner" && (
-          <button
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 6,
-              padding: "7px 14px",
-              background: C.accent,
-              color: "#fff",
-              border: "none",
-              borderRadius: 4,
-              fontSize: 12,
-              fontWeight: 500,
-              cursor: "pointer",
-              fontFamily: "inherit",
-            }}
-          >
-            <i className="ti ti-plus" style={{ fontSize: 14 }} />
-            New Job
-          </button>
+          <>
+            <button
+              onClick={() => setShowNewJob(true)}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 6,
+                padding: "7px 14px",
+                background: C.accent,
+                color: "#fff",
+                border: "none",
+                borderRadius: 4,
+                fontSize: 12,
+                fontWeight: 500,
+                cursor: "pointer",
+                fontFamily: "inherit",
+              }}
+            >
+              <i className="ti ti-plus" style={{ fontSize: 14 }} />
+              New Job
+            </button>
+
+            {showNewJob && (
+              <NewJobModal
+                onClose={() => setShowNewJob(false)}
+                onCreated={fetchJobs}
+              />
+            )}
+          </>
         )}
       </div>
 
@@ -310,7 +212,7 @@ export function Jobs({ role }: { role: Role }) {
           }}
         >
           <span style={{ fontSize: 12, color: C.textSec }}>
-            {rows.length} job{rows.length !== 1 ? "s" : ""}
+            {loading ? "Loading…" : `${total} job${total !== 1 ? "s" : ""}`}
           </span>
           <div style={{ display: "flex", gap: 6 }}>
             {["Filter", "Export"].map((lbl) => (
@@ -333,11 +235,43 @@ export function Jobs({ role }: { role: Role }) {
           </div>
         </div>
 
-        {rows.length > 0 ? (
-          <DataTable columns={cols} rows={rows} />
+        {loading ? (
+          <div
+            style={{
+              padding: "40px 0",
+              textAlign: "center",
+              color: C.textSec,
+              fontSize: 13,
+            }}
+          >
+            Loading jobs…
+          </div>
+        ) : error ? (
+          <div
+            style={{
+              padding: "40px 0",
+              textAlign: "center",
+              color: C.danger,
+              fontSize: 13,
+            }}
+          >
+            {error} —{" "}
+            <span
+              onClick={fetchJobs}
+              style={{ cursor: "pointer", textDecoration: "underline" }}
+            >
+              retry
+            </span>
+          </div>
+        ) : jobs.length > 0 ? (
+          <DataTable columns={cols} rows={jobs} />
         ) : (
           <div
-            style={{ padding: "40px 0", textAlign: "center", color: C.textSec }}
+            style={{
+              padding: "40px 0",
+              textAlign: "center",
+              color: C.textSec,
+            }}
           >
             No jobs matching this filter
           </div>

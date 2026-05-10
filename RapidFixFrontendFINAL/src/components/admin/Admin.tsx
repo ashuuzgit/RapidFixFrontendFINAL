@@ -89,6 +89,7 @@ export default function Admin({ staff }: AdminProps) {
             staff={staff} // pass full staff so Topbar can show name + role
             onMenuToggle={() => setSidebarOpen((prev) => !prev)}
             onLogout={logout}
+            setPage={setPage}
           />
           <main style={{ flex: 1, padding: "22px", overflowY: "auto" }}>
             {renderPage()}

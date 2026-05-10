@@ -197,6 +197,7 @@ export interface Lead {
   status: LeadStatus;
   created_at: string;
   updated_at: string;
+  source: string | null;
   staff: { id: string; name: string } | null;
   customers: { id: string; name: string } | null;
 }

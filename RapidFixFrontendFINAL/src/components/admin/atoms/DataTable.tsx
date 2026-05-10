@@ -8,7 +8,9 @@ interface DataTableProps<T> {
 
 export function DataTable<T>({ columns, rows }: DataTableProps<T>) {
   return (
-    <div style={{ overflowX: "auto" }}>
+    <div
+      style={{ overflowX: "auto", overflowY: "visible", position: "relative" }}
+    >
       <table
         style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}
       >
