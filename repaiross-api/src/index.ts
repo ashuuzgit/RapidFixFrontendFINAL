@@ -15,7 +15,7 @@ import pub from './routes/Public';
 import notify from './routes/notify';
 // add import at the top with the others
 import staff from './routes/staff';
-
+import otp from './routes/otp';
 // add route with the others
 
 export interface Env {
@@ -25,6 +25,7 @@ export interface Env {
 	WA_VERIFY_TOKEN: string;
 	WA_APP_SECRET: string;
 	OWNER_WA_NUMBER: string;
+	FAST2SMS_API_KEY: string;
 }
 
 const app = new Hono<{ Bindings: Env }>();
@@ -43,6 +44,7 @@ app.route('/leads', leads);
 app.route('/webhook', webhook);
 app.route('/public', pub);
 app.route('/notify', notify);
+app.route('/public/otp', otp);
 
 app.get('/', (c) => c.json({ status: 'ok', service: 'repaiross-api' }));
 

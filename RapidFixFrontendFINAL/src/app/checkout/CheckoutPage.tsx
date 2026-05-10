@@ -67,6 +67,10 @@ export default function CheckoutPage() {
   const [success, setSuccess] = useState(false);
   const [bookingId, setBookingId] = useState("");
   const [mounted, setMounted] = useState(false);
+  const [otpSent, setOtpSent] = useState(false);
+  const [otpCode, setOtpCode] = useState("");
+  const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
+  const [otpError, setOtpError] = useState("");
 
   useEffect(() => {
     setMounted(true);
@@ -90,14 +94,21 @@ export default function CheckoutPage() {
       const data = await res.json();
 
       if (data.found) {
+        // Existing customer — no OTP needed
         setCustomerId(data.customerId);
         setWelcomeName(data.name);
         setIsNewCustomer(false);
+        setIsVerified(true);
       } else {
-        setCustomerId(null);
-        setIsNewCustomer(true);
+        // New customer — send OTP, don't verify yet
+        await fetch(`${API_URL}/public/otp/send`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ phone: contact }),
+        });
+        setOtpSent(true);
+        // isVerified stays false until OTP confirmed
       }
-      setIsVerified(true);
     } catch (e) {
       alert("Something went wrong. Please try again.");
     } finally {
@@ -338,15 +349,17 @@ export default function CheckoutPage() {
                         value={contact}
                         onChange={(e) => {
                           setContact(e.target.value);
-                          // reset lookup state if contact changes
-                          if (isVerified) {
+                          if (isVerified || otpSent) {
                             setIsVerified(false);
                             setIsNewCustomer(false);
                             setCustomerId(null);
                             setWelcomeName("");
+                            setOtpSent(false);
+                            setOtpCode("");
+                            setOtpError("");
                           }
                         }}
-                        disabled={isVerified}
+                        disabled={isVerified || otpSent}
                         className={`border-2 h-12 font-bold rounded-none flex-1 ${
                           isVerified
                             ? isNewCustomer
@@ -355,7 +368,7 @@ export default function CheckoutPage() {
                             : "border-[var(--color-grey-200)] focus:border-[var(--color-black)]"
                         }`}
                       />
-                      {!isVerified && (
+                      {!isVerified && !otpSent && (
                         <Button
                           onClick={handleLookup}
                           disabled={!contact || isLookingUp}
@@ -383,7 +396,73 @@ export default function CheckoutPage() {
                   </div>
                 </div>
 
-                {/* Name input — only for new customers */}
+                {/* OTP input — new customers only */}
+                <AnimatePresence>
+                  {otpSent && !isVerified && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      className="mt-6 pt-6 border-t-2 border-dashed border-[var(--color-grey-200)]"
+                    >
+                      <label className="text-[10px] font-black uppercase text-[var(--color-grey-500)] mb-3 block tracking-widest">
+                        Enter OTP sent to {contact}
+                      </label>
+                      <div className="flex gap-3">
+                        <Input
+                          placeholder="6-digit OTP"
+                          maxLength={6}
+                          value={otpCode}
+                          onChange={(e) => setOtpCode(e.target.value)}
+                          className="border-2 border-[var(--color-black)] rounded-none h-12 font-bold tracking-widest max-w-[180px]"
+                        />
+                        <Button
+                          disabled={otpCode.length !== 6 || isVerifyingOtp}
+                          onClick={async () => {
+                            setIsVerifyingOtp(true);
+                            setOtpError("");
+                            try {
+                              const res = await fetch(
+                                `${API_URL}/public/otp/verify`,
+                                {
+                                  method: "POST",
+                                  headers: {
+                                    "Content-Type": "application/json",
+                                  },
+                                  body: JSON.stringify({
+                                    phone: contact,
+                                    code: otpCode,
+                                  }),
+                                },
+                              );
+                              if (!res.ok) throw new Error();
+                              setIsNewCustomer(true);
+                              setIsVerified(true);
+                            } catch {
+                              setOtpError("Invalid or expired OTP. Try again.");
+                            } finally {
+                              setIsVerifyingOtp(false);
+                            }
+                          }}
+                          className="h-12 rounded-none px-6 font-black uppercase tracking-widest shrink-0"
+                        >
+                          {isVerifyingOtp ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : (
+                            "Confirm"
+                          )}
+                        </Button>
+                      </div>
+                      {otpError && (
+                        <p className="text-red-500 text-xs font-bold mt-2">
+                          {otpError}
+                        </p>
+                      )}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                {/* Name input — only after OTP verified */}
                 <AnimatePresence>
                   {isVerified && isNewCustomer && (
                     <motion.div

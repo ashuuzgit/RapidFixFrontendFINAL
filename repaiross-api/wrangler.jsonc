@@ -1,13 +1,14 @@
 {
-  "name": "repaiross-api",
-  "main": "src/index.ts",
-  "compatibility_date": "2024-01-01",
-  "compatibility_flags": ["nodejs_compat"],
+	"name": "repaiross-api",
+	"main": "src/index.ts",
+	"compatibility_date": "2024-01-01",
+	"compatibility_flags": ["nodejs_compat"],
 
-  "workers_dev": true,
-  "preview_urls": true,
+	"workers_dev": true,
+	"preview_urls": true,
 
-  "vars": {
-    "SUPABASE_URL": "https://myoejvzylswkqpfxxcay.supabase.co"
-  }
+	"vars": {
+		"SUPABASE_URL": "https://myoejvzylswkqpfxxcay.supabase.co",
+		"FAST2SMS_API_KEY": ""
+	}
 }
