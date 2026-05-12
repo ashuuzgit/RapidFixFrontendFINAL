@@ -2,9 +2,7 @@
 import { useState, useEffect } from "react";
 import { C, BOOKING_STATUS_CFG, BOOKING_SOURCE_CFG } from "@/lib/constants";
 import { bookingsApi, jobsApi } from "@/lib/api";
-import type { Booking, BookingStatus, Column } from "@/lib/types";
-
-// ── Responsive hook ───────────────────────────────────────────────────────────
+import type { Booking, BookingStatus } from "@/lib/types";
 
 function useWindowWidth() {
   const [width, setWidth] = useState(
@@ -17,8 +15,6 @@ function useWindowWidth() {
   }, []);
   return width;
 }
-
-// ── Helpers ───────────────────────────────────────────────────────────────────
 
 const Mono = ({ v }: { v: string }) => (
   <span style={{ fontFamily: "'Courier New',monospace", fontSize: 12 }}>
@@ -40,8 +36,6 @@ function formatSlot(iso: string | null) {
     hour12: true,
   });
 }
-
-// ── Status Badge ──────────────────────────────────────────────────────────────
 
 function StatusBadge({ status }: { status: BookingStatus }) {
   const cfg = BOOKING_STATUS_CFG[status];
@@ -73,8 +67,6 @@ function StatusBadge({ status }: { status: BookingStatus }) {
     </span>
   );
 }
-
-// ── Source Chip ───────────────────────────────────────────────────────────────
 
 function SourceChip({ source }: { source: string }) {
   const cfg = BOOKING_SOURCE_CFG[source] ?? { bg: C.bg, text: C.textSec };
@@ -125,10 +117,15 @@ function AddBookingModal({
   const [form, setForm] = useState({
     customer_id: "",
     source: "phone",
-    slot_at: "",
+    slot_at: nowLocal(),
     service_notes: "",
     location_id: "",
   });
+  function nowLocal() {
+    const d = new Date();
+    d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+    return d.toISOString().slice(0, 16);
+  }
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -175,7 +172,6 @@ function AddBookingModal({
     }
   }
 
-  // Mobile: slide-up sheet; Desktop: centred modal
   const panelStyle: React.CSSProperties = isMobile
     ? {
         position: "fixed",
@@ -217,7 +213,6 @@ function AddBookingModal({
       }}
     >
       <div style={panelStyle}>
-        {/* Drag handle on mobile */}
         {isMobile && (
           <div
             style={{
@@ -229,7 +224,6 @@ function AddBookingModal({
             }}
           />
         )}
-
         <div
           style={{
             display: "flex",
@@ -254,7 +248,6 @@ function AddBookingModal({
             ×
           </button>
         </div>
-
         <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
           <div>
             <label style={labelStyle}>Customer ID *</label>
@@ -298,7 +291,6 @@ function AddBookingModal({
             />
           </div>
         </div>
-
         {error && (
           <div
             style={{
@@ -314,7 +306,6 @@ function AddBookingModal({
             {error}
           </div>
         )}
-
         <div
           style={{
             display: "flex",
@@ -366,12 +357,21 @@ interface DrawerProps {
   booking: Booking;
   onClose: () => void;
   onUpdated: (b: Booking) => void;
+  onDeleted: (id: string) => void; // NEW
   isMobile: boolean;
 }
 
-function BookingDrawer({ booking, onClose, onUpdated, isMobile }: DrawerProps) {
+function BookingDrawer({
+  booking,
+  onClose,
+  onUpdated,
+  onDeleted,
+  isMobile,
+}: DrawerProps) {
   const [confirming, setConfirming] = useState(false);
   const [converting, setConverting] = useState(false);
+  const [rejecting, setRejecting] = useState(false); // NEW
+  const [deleting, setDeleting] = useState(false); // NEW
   const [error, setError] = useState<string | null>(null);
 
   async function confirm() {
@@ -379,7 +379,7 @@ function BookingDrawer({ booking, onClose, onUpdated, isMobile }: DrawerProps) {
     setError(null);
     try {
       await bookingsApi.confirm(booking.id);
-      onUpdated({ ...booking, status: "converted" });
+      onUpdated({ ...booking, status: "confirmed" }); // fixed: was "converted"
     } catch (e: any) {
       setError(e?.error ?? "Failed to confirm");
     } finally {
@@ -407,6 +407,41 @@ function BookingDrawer({ booking, onClose, onUpdated, isMobile }: DrawerProps) {
     }
   }
 
+  // NEW: reject sets status → cancelled
+  async function reject() {
+    if (!window.confirm("Mark this booking as cancelled?")) return;
+    setRejecting(true);
+    setError(null);
+    try {
+      const updated = await bookingsApi.update(booking.id, {
+        status: "cancelled",
+      });
+      onUpdated({ ...booking, ...updated, status: "cancelled" });
+    } catch (e: any) {
+      setError(e?.error ?? "Failed to reject booking");
+    } finally {
+      setRejecting(false);
+    }
+  }
+
+  // NEW: hard delete
+  async function remove() {
+    if (
+      !window.confirm("Permanently delete this booking? This cannot be undone.")
+    )
+      return;
+    setDeleting(true);
+    setError(null);
+    try {
+      await bookingsApi.delete(booking.id);
+      onDeleted(booking.id);
+      onClose();
+    } catch (e: any) {
+      setError(e?.error ?? "Failed to delete booking");
+      setDeleting(false);
+    }
+  }
+
   const fieldRow = (label: string, value: React.ReactNode) => (
     <div style={{ marginBottom: 14 }}>
       <span
@@ -430,7 +465,6 @@ function BookingDrawer({ booking, onClose, onUpdated, isMobile }: DrawerProps) {
     ? `${booking.vehicles.make ?? ""} ${booking.vehicles.model ?? ""}${booking.vehicles.registration ? " · " + booking.vehicles.registration : ""}`.trim()
     : null;
 
-  // Mobile: bottom sheet; Desktop: right-side drawer
   const drawerStyle: React.CSSProperties = isMobile
     ? {
         position: "fixed",
@@ -462,7 +496,6 @@ function BookingDrawer({ booking, onClose, onUpdated, isMobile }: DrawerProps) {
 
   return (
     <>
-      {/* Backdrop */}
       <div
         style={{
           position: "fixed",
@@ -472,10 +505,7 @@ function BookingDrawer({ booking, onClose, onUpdated, isMobile }: DrawerProps) {
         }}
         onClick={onClose}
       />
-
-      {/* Drawer / Sheet */}
       <div style={drawerStyle}>
-        {/* Drag handle (mobile only) */}
         {isMobile && (
           <div
             style={{
@@ -566,7 +596,18 @@ function BookingDrawer({ booking, onClose, onUpdated, isMobile }: DrawerProps) {
               {booking.confirmation_sent ? "✓ Sent" : "Not sent"}
             </span>,
           )}
-
+          {booking.updated_at &&
+            booking.status !== "pending" &&
+            fieldRow(
+              (
+                {
+                  confirmed: "Confirmed at",
+                  arrived: "Converted at",
+                  cancelled: "Rejected at",
+                } as Record<string, string>
+              )[booking.status] ?? "Updated at",
+              <Muted v={formatSlot(booking.updated_at)} />,
+            )}
           {error && (
             <div
               style={{
@@ -584,56 +625,96 @@ function BookingDrawer({ booking, onClose, onUpdated, isMobile }: DrawerProps) {
           )}
         </div>
 
-        {/* Footer */}
+        {/* Footer — left: destructive | right: progression */}
         <div
           style={{
             padding: isMobile ? "12px 16px 24px" : "14px 20px",
             borderTop: `1px solid ${C.border}`,
             display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
             gap: 8,
-            justifyContent: "flex-end",
             flexShrink: 0,
           }}
         >
-          {booking.status === "pending" && (
+          {/* Destructive actions */}
+          <div style={{ display: "flex", gap: 8 }}>
+            {booking.status !== "cancelled" && (
+              <button
+                onClick={reject}
+                disabled={rejecting || deleting}
+                style={{
+                  padding: "7px 12px",
+                  borderRadius: 4,
+                  fontSize: 13,
+                  background: "none",
+                  border: `1px solid ${C.danger}`,
+                  color: rejecting ? C.textMuted : C.danger,
+                  cursor: rejecting || deleting ? "not-allowed" : "pointer",
+                  fontWeight: 600,
+                  opacity: deleting ? 0.5 : 1,
+                }}
+              >
+                {rejecting ? "Rejecting…" : "✕ Reject"}
+              </button>
+            )}
             <button
-              onClick={confirm}
-              disabled={confirming}
+              onClick={remove}
+              disabled={deleting || rejecting}
               style={{
-                flex: isMobile ? 1 : undefined,
-                padding: "7px 16px",
+                padding: "7px 12px",
                 borderRadius: 4,
                 fontSize: 13,
-                background: confirming ? C.textMuted : C.success,
+                background: deleting ? C.textMuted : C.danger,
                 border: "none",
                 color: "#fff",
-                cursor: confirming ? "not-allowed" : "pointer",
+                cursor: deleting || rejecting ? "not-allowed" : "pointer",
                 fontWeight: 600,
               }}
             >
-              {confirming ? "Confirming…" : "✓ Confirm Booking"}
+              {deleting ? "Deleting…" : "🗑 Delete"}
             </button>
-          )}
+          </div>
 
-          {booking.status === "confirmed" && (
-            <button
-              onClick={convertToJob}
-              disabled={converting}
-              style={{
-                flex: isMobile ? 1 : undefined,
-                padding: "7px 16px",
-                borderRadius: 4,
-                fontSize: 13,
-                background: converting ? C.textMuted : C.accent,
-                border: "none",
-                color: "#fff",
-                cursor: converting ? "not-allowed" : "pointer",
-                fontWeight: 600,
-              }}
-            >
-              {converting ? "Creating Job…" : "→ Convert to Job"}
-            </button>
-          )}
+          {/* Progression actions */}
+          <div style={{ display: "flex", gap: 8 }}>
+            {booking.status === "pending" && (
+              <button
+                onClick={confirm}
+                disabled={confirming || deleting || rejecting}
+                style={{
+                  padding: "7px 14px",
+                  borderRadius: 4,
+                  fontSize: 13,
+                  background: confirming ? C.textMuted : C.success,
+                  border: "none",
+                  color: "#fff",
+                  cursor: confirming ? "not-allowed" : "pointer",
+                  fontWeight: 600,
+                }}
+              >
+                {confirming ? "Confirming…" : "✓ Confirm"}
+              </button>
+            )}
+            {booking.status === "confirmed" && (
+              <button
+                onClick={convertToJob}
+                disabled={converting || deleting || rejecting}
+                style={{
+                  padding: "7px 14px",
+                  borderRadius: 4,
+                  fontSize: 13,
+                  background: converting ? C.textMuted : C.accent,
+                  border: "none",
+                  color: "#fff",
+                  cursor: converting ? "not-allowed" : "pointer",
+                  fontWeight: 600,
+                }}
+              >
+                {converting ? "Creating Job…" : "→ Convert to Job"}
+              </button>
+            )}
+          </div>
         </div>
       </div>
     </>
@@ -641,12 +722,12 @@ function BookingDrawer({ booking, onClose, onUpdated, isMobile }: DrawerProps) {
 }
 
 // ── Filter Tabs ───────────────────────────────────────────────────────────────
+// Removed "converted" — not in schema. Status flow: pending → confirmed → arrived → cancelled
 
 const FILTERS: { label: string; value: string }[] = [
   { label: "All", value: "" },
   { label: "Pending", value: "pending" },
   { label: "Confirmed", value: "confirmed" },
-  { label: "Converted", value: "converted" },
   { label: "Arrived", value: "arrived" },
   { label: "Cancelled", value: "cancelled" },
 ];
@@ -676,7 +757,6 @@ function BookingCard({
       onTouchStart={(e) => (e.currentTarget.style.background = C.bg)}
       onTouchEnd={(e) => (e.currentTarget.style.background = "transparent")}
     >
-      {/* Row 1: name + status */}
       <div
         style={{
           display: "flex",
@@ -690,8 +770,6 @@ function BookingCard({
         </span>
         <StatusBadge status={booking.status} />
       </div>
-
-      {/* Row 2: phone + slot */}
       <div
         style={{
           display: "flex",
@@ -703,8 +781,6 @@ function BookingCard({
         <Mono v={booking.customers?.phone ?? "—"} />
         <Muted v={formatSlot(booking.slot_at)} />
       </div>
-
-      {/* Row 3: service + source */}
       <div
         style={{
           display: "flex",
@@ -834,7 +910,6 @@ export function Bookings() {
           gap: isMobile ? 10 : 12,
         }}
       >
-        {/* Filter tabs — horizontally scrollable on mobile */}
         <div
           style={{
             overflowX: "auto",
@@ -882,8 +957,6 @@ export function Bookings() {
             ))}
           </div>
         </div>
-
-        {/* Date + count + button */}
         <div
           style={{
             display: "flex",
@@ -911,11 +984,7 @@ export function Bookings() {
           />
           {!loading && (
             <span
-              style={{
-                fontSize: 12,
-                color: C.textSec,
-                whiteSpace: "nowrap",
-              }}
+              style={{ fontSize: 12, color: C.textSec, whiteSpace: "nowrap" }}
             >
               {total} booking{total !== 1 ? "s" : ""}
             </span>
@@ -943,7 +1012,6 @@ export function Bookings() {
         </div>
       </div>
 
-      {/* Error */}
       {error && (
         <div
           style={{
@@ -985,7 +1053,6 @@ export function Bookings() {
         }}
       >
         {loading ? (
-          // Skeleton
           <div>
             {Array.from({ length: 7 }).map((_, i) => (
               <div
@@ -1029,13 +1096,12 @@ export function Bookings() {
               className="ti ti-calendar-off"
               style={{ fontSize: 28, display: "block", marginBottom: 8 }}
             />
-            No bookings{" "}
+            No bookings
             {date
-              ? `for ${new Date(date + "T00:00:00").toLocaleDateString("en-IN", { day: "2-digit", month: "short" })}`
-              : "found"}
+              ? ` for ${new Date(date + "T00:00:00").toLocaleDateString("en-IN", { day: "2-digit", month: "short" })}`
+              : " found"}
           </div>
         ) : isMobile ? (
-          // ── Mobile: card list ──
           <div>
             {bookings.map((booking) => (
               <BookingCard
@@ -1046,7 +1112,6 @@ export function Bookings() {
             ))}
           </div>
         ) : (
-          // ── Desktop: table ──
           <>
             <div
               style={{
@@ -1072,7 +1137,6 @@ export function Bookings() {
                 </span>
               ))}
             </div>
-
             {bookings.map((booking) => (
               <div
                 key={booking.id}
@@ -1152,7 +1216,6 @@ export function Bookings() {
         </div>
       )}
 
-      {/* Modals */}
       {showAdd && (
         <AddBookingModal
           onClose={() => setShowAdd(false)}
@@ -1176,17 +1239,17 @@ export function Bookings() {
             );
             setSelected(updated);
           }}
+          onDeleted={(id) => {
+            // NEW
+            setBookings((prev) => prev.filter((b) => b.id !== id));
+            setTotal((t) => t - 1);
+          }}
         />
       )}
 
       <style>{`
-        @keyframes pulse {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0.4; }
-        }
-        ::-webkit-scrollbar {
-          display: none;
-        }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+        ::-webkit-scrollbar { display: none; }
       `}</style>
     </div>
   );

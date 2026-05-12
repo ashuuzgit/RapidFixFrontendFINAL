@@ -121,6 +121,7 @@ export interface Booking {
   service_notes: string | null;
   confirmation_sent: boolean;
   created_at: string;
+  updated_at: string | null;
   customers: { id: string; name: string; phone: string } | null;
   vehicles: {
     id: string;

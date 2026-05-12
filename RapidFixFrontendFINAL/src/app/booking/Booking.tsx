@@ -1015,132 +1015,136 @@ export default function Booking() {
                     </div>
                   )}
 
-                  <div className="space-y-4">
-                    {(vehicleType === "Bike"
-                      ? BIKE_SERVICES
-                      : CAR_SERVICES
-                    ).map((service, idx) => {
-                      const isExpanded = expandedService === service.title;
-                      const isSelected = serviceType === service.title;
-                      const price = (service as any).prices
-                        ? (service as any).prices[bikeCC || "0 - 150"]
-                        : (service as any).price;
+                  {(vehicleType !== "Bike" ||
+                    engineType === "Electric" ||
+                    bikeCC) && (
+                    <div className="space-y-4">
+                      {(vehicleType === "Bike"
+                        ? BIKE_SERVICES
+                        : CAR_SERVICES
+                      ).map((service, idx) => {
+                        const isExpanded = expandedService === service.title;
+                        const isSelected = serviceType === service.title;
+                        const price = (service as any).prices
+                          ? (service as any).prices[bikeCC || "0 - 150"]
+                          : (service as any).price;
 
-                      return (
-                        <div
-                          key={idx}
-                          className={`border-2 transition-all overflow-hidden ${
-                            isSelected
-                              ? "border-[var(--color-primary)] ring-2 ring-[var(--color-primary)] ring-opacity-20"
-                              : "border-[var(--color-grey-200)]"
-                          }`}
-                        >
+                        return (
                           <div
-                            onClick={() => {
-                              setServiceType(service.title);
-                              setExpandedService(
-                                isExpanded ? null : service.title,
-                              );
-                            }}
-                            className="p-4 flex items-center justify-between cursor-pointer hover:bg-[var(--color-grey-50)]"
+                            key={idx}
+                            className={`border-2 transition-all overflow-hidden ${
+                              isSelected
+                                ? "border-[var(--color-primary)] ring-2 ring-[var(--color-primary)] ring-opacity-20"
+                                : "border-[var(--color-grey-200)]"
+                            }`}
                           >
-                            <div className="flex items-center gap-4">
-                              <div
-                                className={`p-3 rounded-lg ${isSelected ? "bg-[var(--color-primary)] text-white" : "bg-[var(--color-grey-100)] text-[var(--color-grey-600)]"}`}
-                              >
-                                {service.icon}
-                              </div>
-                              <div>
-                                <h3 className="font-black text-lg uppercase tracking-tight">
-                                  {service.title}
-                                </h3>
-                                <div className="flex items-center gap-2 mt-1">
-                                  <span className="text-xl font-black text-[var(--color-primary)]">
-                                    ₹{price}
-                                  </span>
-                                  {service.duration && (
-                                    <span className="text-[10px] font-bold text-[var(--color-grey-500)] flex items-center gap-1 uppercase">
-                                      <Clock className="w-3 h-3" />{" "}
-                                      {service.duration}
-                                    </span>
-                                  )}
+                            <div
+                              onClick={() => {
+                                setServiceType(service.title);
+                                setExpandedService(
+                                  isExpanded ? null : service.title,
+                                );
+                              }}
+                              className="p-4 flex items-center justify-between cursor-pointer hover:bg-[var(--color-grey-50)]"
+                            >
+                              <div className="flex items-center gap-4">
+                                <div
+                                  className={`p-3 rounded-lg ${isSelected ? "bg-[var(--color-primary)] text-white" : "bg-[var(--color-grey-100)] text-[var(--color-grey-600)]"}`}
+                                >
+                                  {service.icon}
                                 </div>
-                              </div>
-                            </div>
-                            <ChevronDown
-                              className={`transition-transform duration-300 ${isExpanded ? "rotate-180" : ""}`}
-                            />
-                          </div>
-
-                          <AnimatePresence>
-                            {isExpanded && (
-                              <motion.div
-                                initial={{ height: 0 }}
-                                animate={{ height: "auto" }}
-                                exit={{ height: 0 }}
-                                className="overflow-hidden"
-                              >
-                                <div className="p-4 pt-0 border-t border-[var(--color-grey-100)] bg-[var(--color-grey-50)]">
-                                  <div className="py-4 space-y-4">
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                      <div>
-                                        <p className="text-xs font-black uppercase text-[var(--color-grey-500)] mb-2">
-                                          Details
-                                        </p>
-                                        <p className="text-sm font-medium leading-relaxed">
-                                          {service.description}
-                                        </p>
-                                        {service.interval && (
-                                          <p className="text-xs font-bold text-[var(--color-primary)] mt-2 uppercase">
-                                            {service.interval}
-                                          </p>
-                                        )}
-                                      </div>
-                                      {service.features && (
-                                        <div>
-                                          <p className="text-xs font-black uppercase text-[var(--color-grey-500)] mb-2">
-                                            What's Included
-                                          </p>
-                                          <div className="grid grid-cols-1 gap-1">
-                                            {service.features.map((f, i) => (
-                                              <div
-                                                key={i}
-                                                className="flex items-start gap-2 text-xs font-medium"
-                                              >
-                                                <Check className="w-3 h-3 mt-0.5 text-green-500 shrink-0" />
-                                                <span>{f}</span>
-                                              </div>
-                                            ))}
-                                          </div>
-                                        </div>
-                                      )}
-                                    </div>
-                                    <Button
-                                      className="w-full h-14 md:h-16 text-lg font-black uppercase tracking-[0.2em] rounded-none group relative overflow-hidden bg-[var(--color-grey-200)] text-black border-2 border-black active:scale-95 transition-transform"
-                                      disabled={
-                                        vehicleType === "Bike" &&
-                                        engineType !== "Electric" &&
-                                        !bikeCC
-                                      }
-                                      onClick={() =>
-                                        (window.location.href = "/checkout")
-                                      }
-                                    >
-                                      <div className="relative z-10 flex items-center justify-center gap-3">
-                                        Select & Checkout{" "}
-                                        <ChevronRight className="w-5 h-5 group-hover:translate-x-2 transition-transform" />
-                                      </div>
-                                      <div className="absolute inset-0 bg-white/10 translate-y-full group-hover:translate-y-0 transition-transform duration-500 skew-y-12 origin-bottom"></div>
-                                    </Button>
+                                <div>
+                                  <h3 className="font-black text-lg uppercase tracking-tight">
+                                    {service.title}
+                                  </h3>
+                                  <div className="flex items-center gap-2 mt-1">
+                                    <span className="text-xl font-black text-[var(--color-primary)]">
+                                      ₹{price}
+                                    </span>
+                                    {service.duration && (
+                                      <span className="text-[10px] font-bold text-[var(--color-grey-500)] flex items-center gap-1 uppercase">
+                                        <Clock className="w-3 h-3" />{" "}
+                                        {service.duration}
+                                      </span>
+                                    )}
                                   </div>
                                 </div>
-                              </motion.div>
-                            )}
-                          </AnimatePresence>
-                        </div>
-                      );
-                    })}
-                  </div>
+                              </div>
+                              <ChevronDown
+                                className={`transition-transform duration-300 ${isExpanded ? "rotate-180" : ""}`}
+                              />
+                            </div>
+
+                            <AnimatePresence>
+                              {isExpanded && (
+                                <motion.div
+                                  initial={{ height: 0 }}
+                                  animate={{ height: "auto" }}
+                                  exit={{ height: 0 }}
+                                  className="overflow-hidden"
+                                >
+                                  <div className="p-4 pt-0 border-t border-[var(--color-grey-100)] bg-[var(--color-grey-50)]">
+                                    <div className="py-4 space-y-4">
+                                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div>
+                                          <p className="text-xs font-black uppercase text-[var(--color-grey-500)] mb-2">
+                                            Details
+                                          </p>
+                                          <p className="text-sm font-medium leading-relaxed">
+                                            {service.description}
+                                          </p>
+                                          {service.interval && (
+                                            <p className="text-xs font-bold text-[var(--color-primary)] mt-2 uppercase">
+                                              {service.interval}
+                                            </p>
+                                          )}
+                                        </div>
+                                        {service.features && (
+                                          <div>
+                                            <p className="text-xs font-black uppercase text-[var(--color-grey-500)] mb-2">
+                                              What's Included
+                                            </p>
+                                            <div className="grid grid-cols-1 gap-1">
+                                              {service.features.map((f, i) => (
+                                                <div
+                                                  key={i}
+                                                  className="flex items-start gap-2 text-xs font-medium"
+                                                >
+                                                  <Check className="w-3 h-3 mt-0.5 text-green-500 shrink-0" />
+                                                  <span>{f}</span>
+                                                </div>
+                                              ))}
+                                            </div>
+                                          </div>
+                                        )}
+                                      </div>
+                                      <Button
+                                        className="w-full h-14 md:h-16 text-lg font-black uppercase tracking-[0.2em] rounded-none group relative overflow-hidden bg-[var(--color-grey-200)] text-black border-2 border-black active:scale-95 transition-transform"
+                                        disabled={
+                                          vehicleType === "Bike" &&
+                                          engineType !== "Electric" &&
+                                          !bikeCC
+                                        }
+                                        onClick={() =>
+                                          (window.location.href = "/checkout")
+                                        }
+                                      >
+                                        <div className="relative z-10 flex items-center justify-center gap-3">
+                                          Select & Checkout{" "}
+                                          <ChevronRight className="w-5 h-5 group-hover:translate-x-2 transition-transform" />
+                                        </div>
+                                        <div className="absolute inset-0 bg-white/10 translate-y-full group-hover:translate-y-0 transition-transform duration-500 skew-y-12 origin-bottom"></div>
+                                      </Button>
+                                    </div>
+                                  </div>
+                                </motion.div>
+                              )}
+                            </AnimatePresence>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
 
                   <div className="pt-8">
                     <Button

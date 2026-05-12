@@ -157,8 +157,6 @@ export const jobsApi = {
     booking_id?: string;
   }) => api<Job>("/jobs", { method: "POST", body: JSON.stringify(body) }),
 
-  
-
   update: (
     id: string,
     body: {
@@ -223,6 +221,9 @@ export const bookingsApi = {
 
   confirm: (id: string) =>
     api<{ success: boolean }>(`/bookings/${id}/confirm`, { method: "POST" }),
+
+  delete: (id: string) =>
+    api<{ success: boolean }>(`/bookings/${id}`, { method: "DELETE" }),
 };
 
 // ── Bills ─────────────────────────────────────────────────────────────────────
