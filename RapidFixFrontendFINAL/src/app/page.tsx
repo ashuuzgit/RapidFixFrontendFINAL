@@ -28,8 +28,8 @@ export default function Home() {
         mediaType="sequence"
         mediaSrc=""
         bgImageSrc="/engine.webp"
-        title="RAPIDFIX AUTO"
-        date="Your vehicle deserves the right fix"
+        title="Precision Engineering"
+        date="Performance"
       />
 
       {/* Guarantees Bar (Image 2) */}
