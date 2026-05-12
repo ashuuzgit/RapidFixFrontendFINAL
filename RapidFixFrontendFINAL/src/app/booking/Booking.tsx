@@ -51,13 +51,13 @@ const BIKE_BRANDS = [
     logo: "https://upload.wikimedia.org/wikipedia/commons/f/f4/BMW_logo_%28gray%29.svg",
   },
   { name: "Benelli", logo: "/brandLogos/benelli.png" },
-  { name: "Ducati", logo: "/brandLogos/ducati.svg" },
+  { name: "Ducati", logo: "/brandLogos/Ducati.svg" },
   { name: "Harley Davidson", logo: "/brandLogos/harley.webp" },
   { name: "Husqvarna", logo: "/brandLogos/Husqvarna.svg" },
   { name: "Hyosung", logo: "/brandLogos/hyosung.svg" },
   { name: "Indian", logo: "/brandLogos/indian.svg" },
-  { name: "Kawasaki", logo: "/brandLogos/kawasaki.svg" },
-  { name: "Triumph", logo: "/brandLogos/triumph.svg" },
+  { name: "Kawasaki", logo: "/brandLogos/Kawasaki.svg" },
+  { name: "Triumph", logo: "/brandLogos/Triumph.svg" },
   { name: "Ola Electric", logo: "/brandLogos/ola.webp" },
 ];
 
