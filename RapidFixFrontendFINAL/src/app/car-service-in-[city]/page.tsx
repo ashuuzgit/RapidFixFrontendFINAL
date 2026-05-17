@@ -11,28 +11,28 @@ type Props = { params: { city: string } };
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const city = formatCity(params?.city || "your-city");
   return {
-    title: `Mechanic Near Me in ${city} | RapidFix`,
-    description: `Looking for a mechanic near you in ${city}? RapidFix offers doorstep car & bike service, repair, wash, and EV service in ${city}.`,
+    title: `Car Service in ${city} | RapidFix`,
+    description: `Book doorstep car service in ${city} with RapidFix. We provide the best car repair near me.`,
     keywords: ["car service near me","bike service near me","car repair near me","bike repair near me","car wash near me","bike wash near me","engine repair near me","car AC repair near me","battery replacement near me","tyre and wheel near me","denting and painting near me","EV service near me","puncture repair near me","rapidfix","rapidfixauto","automotive repair Delhi","mechanic near me"],
-    alternates: { canonical: `https://rapidfixauto.in/mechanic-near-me-in-${params?.city}` },
+    alternates: { canonical: `https://rapidfixauto.in/car-service-in-${params?.city}` },
   };
 }
 
-export default function MechanicCityPage({ params }: Props) {
+export default function CarServiceInCityPage({ params }: Props) {
   const cityName = formatCity(params?.city || "your-city");
 
   return (
     <div className="w-full flex flex-col bg-white overflow-hidden relative pt-24">
       <main className="container mx-auto px-8 py-16 max-w-5xl">
         <h1 className="text-5xl md:text-7xl font-black uppercase tracking-tight leading-none mb-6">
-          Mechanic Near Me in {cityName}
+          Car Service in {cityName}
         </h1>
         <div className="mt-8 mb-12 text-lg text-black/70 font-medium space-y-6">
           <p>
-            RapidFix is now operating in {cityName} to provide top-tier <strong>automotive repair Delhi</strong> NCR wide. If you are searching for a reliable <strong>mechanic near me</strong>, you have found the best in class.
+            Seeking a premium <strong>car service near me</strong> or <strong>car repair near me</strong> in {cityName}? RapidFix brings dealership-level service to your doorstep.
           </p>
           <p>
-            We offer comprehensive doorstep services including <strong>car service near me</strong>, <strong>bike service near me</strong>, <strong>car AC repair near me</strong>, <strong>denting and painting near me</strong>, and even <strong>EV service near me</strong>. Our certified mechanics bring the garage to your home, guaranteeing absolute precision.
+            We handle everything from <strong>car wash near me</strong> and <strong>car AC repair near me</strong> to <strong>tyre and wheel near me</strong> alignments and flawless <strong>denting and painting near me</strong>. Trust the finest <strong>mechanic near me</strong> with RapidFixAuto.
           </p>
         </div>
       </main>

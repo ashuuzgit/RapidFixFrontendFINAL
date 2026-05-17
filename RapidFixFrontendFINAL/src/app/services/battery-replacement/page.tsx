@@ -4,36 +4,42 @@ import { Button } from "@antigravity/ui/Button";
 import { ArrowRight, ShieldCheck, Clock, Banknote } from "lucide-react";
 import { BrandsStrip } from "@/components/BrandsStrip";
 import { StatisticsStrip } from "@/components/StatisticsStrip";
-import { formatCity } from "@/lib/utils";
 
-type Props = { params: { city: string } };
+export const metadata: Metadata = {
+  title: "Battery Replacement | Doorstep Service | RapidFix",
+  description: "Book expert battery replacement with RapidFix. We provide the best car repair near me, bike repair near me, and automotive repair in Delhi NCR.",
+  keywords: ["car service near me","bike service near me","car repair near me","bike repair near me","car wash near me","bike wash near me","engine repair near me","car AC repair near me","battery replacement near me","tyre and wheel near me","denting and painting near me","EV service near me","puncture repair near me","rapidfix","rapidfixauto","automotive repair Delhi","mechanic near me"],
+  alternates: { canonical: "https://rapidfixauto.in/services/battery-replacement" },
+};
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const city = formatCity(params?.city || "your-city");
-  return {
-    title: `Mechanic Near Me in ${city} | RapidFix`,
-    description: `Looking for a mechanic near you in ${city}? RapidFix offers doorstep car & bike service, repair, wash, and EV service in ${city}.`,
-    keywords: ["car service near me","bike service near me","car repair near me","bike repair near me","car wash near me","bike wash near me","engine repair near me","car AC repair near me","battery replacement near me","tyre and wheel near me","denting and painting near me","EV service near me","puncture repair near me","rapidfix","rapidfixauto","automotive repair Delhi","mechanic near me"],
-    alternates: { canonical: `https://rapidfixauto.in/mechanic-near-me-in-${params?.city}` },
-  };
-}
-
-export default function MechanicCityPage({ params }: Props) {
-  const cityName = formatCity(params?.city || "your-city");
-
+export default function batteryreplacementPage() {
   return (
     <div className="w-full flex flex-col bg-white overflow-hidden relative pt-24">
       <main className="container mx-auto px-8 py-16 max-w-5xl">
-        <h1 className="text-5xl md:text-7xl font-black uppercase tracking-tight leading-none mb-6">
-          Mechanic Near Me in {cityName}
+        <h1 className="text-5xl md:text-7xl font-black uppercase tracking-tight leading-none mb-6 text-black">
+          Battery Replacement
         </h1>
-        <div className="mt-8 mb-12 text-lg text-black/70 font-medium space-y-6">
-          <p>
-            RapidFix is now operating in {cityName} to provide top-tier <strong>automotive repair Delhi</strong> NCR wide. If you are searching for a reliable <strong>mechanic near me</strong>, you have found the best in class.
-          </p>
-          <p>
-            We offer comprehensive doorstep services including <strong>car service near me</strong>, <strong>bike service near me</strong>, <strong>car AC repair near me</strong>, <strong>denting and painting near me</strong>, and even <strong>EV service near me</strong>. Our certified mechanics bring the garage to your home, guaranteeing absolute precision.
-          </p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mt-12">
+          <div>
+            <h2 className="text-2xl font-bold uppercase mb-4">Precision & Performance</h2>
+            <p className="text-lg text-black/70 font-medium mb-6">
+              When searching for <strong>battery replacement near me</strong>, RapidFix is your ultimate destination for professional auto care. From comprehensive <strong>car wash near me</strong> and <strong>bike wash near me</strong> services to advanced <strong>engine repair near me</strong>, we deliver dealership-quality maintenance right to your doorstep.
+            </p>
+            <p className="text-lg text-black/70 font-medium">
+              We cover all your needs including <strong>battery replacement near me</strong>, <strong>tyre and wheel near me</strong>, <strong>puncture repair near me</strong>, and seamless <strong>denting and painting near me</strong>. If you are looking for <strong>automotive repair Delhi</strong> or the most trusted <strong>mechanic near me</strong>, RapidFixAuto ensures peak performance and safety.
+            </p>
+          </div>
+          <div className="bg-[var(--color-grey-100)] p-8 border-2 border-black flex flex-col justify-center relative overflow-hidden">
+             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[8vw] font-black opacity-[0.03] uppercase tracking-tighter whitespace-nowrap z-0 pointer-events-none text-black">
+              RAPIDFIX
+            </div>
+            <h3 className="text-xl font-bold uppercase mb-4 z-10 relative">Transparent Pricing</h3>
+            <ul className="space-y-3 font-medium text-black/70 z-10 relative">
+              <li className="flex justify-between border-b border-black/10 pb-2"><span>Standard Checkup</span> <span>₹299</span></li>
+              <li className="flex justify-between border-b border-black/10 pb-2"><span>Comprehensive Care</span> <span>₹899</span></li>
+              <li className="flex justify-between pb-2"><span>Premium Service</span> <span>₹1499</span></li>
+            </ul>
+          </div>
         </div>
       </main>
 

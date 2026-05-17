@@ -2,81 +2,13 @@ import type { MetadataRoute } from 'next';
 
 // Add all the cities you want to rank for
 const cities = [
-  'delhi',
-  'new-delhi',
-  'noida',
-  'gurgaon',
-  'faridabad',
-  'ghaziabad',
-  'greater-noida',
-  'mumbai',
-  'pune',
-  'bangalore',
-  'hyderabad',
-  'chennai',
-  'kolkata',
-  'lucknow',
-  'kanpur',
-  'allahabad',
-  'varanasi',
-  'meerut',
-  'agra',
-  'mathura',
-  'bareilly',
-  'gorakhpur',
-  'aligarh',
-  'moradabad',
-  'jhansi',
-  ' Saharanpur',
-  'firozabad',
-  ' Etawah',
-  'azamgarh',
-  'budaun',
-  'bulandshahr',
-  'hathras',
-  'kasganj',
-  'bijnor',
-  'basti',
-  'bahraich',
-  'lalitpur',
-  'siddharthnagar',
-  'shamli',
-  'gonda',
-  'shravasti',
-  'maharajganj',
-  'pilibhit',
-  'balia',
-  'sultanpur',
-  'amethi',
-  'pratapgarh',
-  'kushinagar',
-  'sant kabir nagar',
-  'sitapur',
-  'barabanki',
-  'unnao',
-  'kanpur dehat',
-  'etah',
-  'mainpuri',
-  'agrawal',
-  'shamli',
-  'gonda',
-  'shravasti',
-  'maharajganj',
-  'pilibhit',
-  'balia',
-  'sultanpur',
-  'amethi',
-  'pratapgarh',
-  'kushinagar',
-  'sant kabir nagar',
-  'sitapur',
-  'barabanki',
-  'unnao',
-  'kanpur dehat',
-  'etah',
-  'mainpuri',
-  'agrawal',
+  'delhi', 'noida', 'gurgaon', 'faridabad', 'ghaziabad', 'greater-noida', 'dwarka'
+];
 
+const services = [
+  'bike-service', 'car-service', 'bike-repair', 'car-repair',
+  'puncture-repair', 'car-ac-repair', 'denting-painting',
+  'ev-service', 'battery-replacement', 'tyre-wheel'
 ];
 
 export default function sitemap(): MetadataRoute.Sitemap {
@@ -114,6 +46,18 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: 'monthly',
       priority: 0.5,
     },
+    {
+      url: `${baseUrl}/locations`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.7,
+    },
+    {
+      url: `${baseUrl}/blog`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.6,
+    },
   ];
 
   // Dynamic [city] routes
@@ -124,5 +68,26 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.9,   // high priority — these are your SEO money pages
   }));
 
-  return [...staticRoutes, ...cityRoutes];
+  const serviceRoutes: MetadataRoute.Sitemap = services.map(s => ({
+    url: `${baseUrl}/services/${s}`,
+    lastModified: new Date(),
+    changeFrequency: 'weekly' as const,
+    priority: 0.8,
+  }));
+
+  const bikeServiceCityRoutes: MetadataRoute.Sitemap = cities.map(city => ({
+    url: `${baseUrl}/bike-service-in-${city}`,
+    lastModified: new Date(),
+    changeFrequency: 'weekly' as const,
+    priority: 0.9,
+  }));
+
+  const carServiceCityRoutes: MetadataRoute.Sitemap = cities.map(city => ({
+    url: `${baseUrl}/car-service-in-${city}`,
+    lastModified: new Date(),
+    changeFrequency: 'weekly' as const,
+    priority: 0.9,
+  }));
+
+  return [...staticRoutes, ...cityRoutes, ...serviceRoutes, ...bikeServiceCityRoutes, ...carServiceCityRoutes];
 }

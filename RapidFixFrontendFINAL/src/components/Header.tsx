@@ -43,9 +43,9 @@ export function Header() {
             onMouseEnter={() => setIsServicesOpen(true)}
             onMouseLeave={() => setIsServicesOpen(false)}
           >
-            <button className="hover:text-[var(--color-primary)] transition-colors uppercase cursor-pointer flex items-center h-20">
+            <Link href="/services" className="hover:text-[var(--color-primary)] transition-colors uppercase cursor-pointer flex items-center h-20">
               SERVICES
-            </button>
+            </Link>
             <AnimatePresence>
               {isServicesOpen && (
                 <motion.div
