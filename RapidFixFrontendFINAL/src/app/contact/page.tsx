@@ -7,6 +7,13 @@ import { Input } from "@antigravity/ui/Input"
 import { Textarea } from "@antigravity/ui/Textarea"
 import { submitContact } from "@/app/actions/contact"
 import { MapPin, Mail, Phone, Loader2 } from "lucide-react"
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Contact Us",
+  description: "Get in touch with RapidFix for car & bike service queries, support, or feedback. We're here to help.",
+  alternates: { canonical: "https://rapidfixauto.in/contact" },
+};
 
 type ContactFormData = {
   name: string;

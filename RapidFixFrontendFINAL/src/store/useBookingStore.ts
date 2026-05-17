@@ -74,9 +74,9 @@ export const useBookingStore = create<BookingState>()(
           serviceType: null,
         }),
       setEngineType: (type) =>
-        set({ engineType: type, brand: null, model: null }),
-      setBrand: (brand) => set({ brand, model: null }),
-      setModel: (model) => set({ model }),
+        set({ engineType: type, brand: null, model: null, bikeCC: null }),
+      setBrand: (brand) => set({ brand, model: null, bikeCC: null }),
+      setModel: (model) => set({ model, bikeCC: null }),
       setBikeCC: (cc) => set({ bikeCC: cc, serviceType: null }),
       setServiceType: (type) => set({ serviceType: type }),
       setDate: (date) => set({ date }),
@@ -108,21 +108,29 @@ export const useBookingStore = create<BookingState>()(
         }),
 
       getEstimate: () => {
-        const { vehicleType, serviceType, bikeCC } = get();
+        const { vehicleType, serviceType, bikeCC, engineType } = get();
         if (!serviceType) return 0;
 
         if (vehicleType === "Bike") {
           if (serviceType === "General Service") {
-            if (bikeCC === "0 - 150") return 799;
-            if (bikeCC === "150 - 250") return 899;
-            if (bikeCC === "250 - 400") return 999;
-            if (bikeCC === "450 - 650") return 1099;
+            if (engineType === "Electric") return 799;
+            if (bikeCC === "0 - 150 CC") return 799;
+            if (bikeCC === "150 - 250 CC") return 899;
+            if (bikeCC === "250 - 400 CC") return 999;
+            if (bikeCC === "400 - 450 CC") return 1049;
+            if (bikeCC === "450 - 650 CC") return 1099;
+            if (bikeCC === "650+ CC") return 1299;
+            return 799;
           }
           if (serviceType === "General Service with Engine Oil") {
-            if (bikeCC === "0 - 150") return 1249;
-            if (bikeCC === "150 - 250") return 1349;
-            if (bikeCC === "250 - 400") return 2549;
-            if (bikeCC === "450 - 650") return 2649;
+            if (engineType === "Electric") return 1249;
+            if (bikeCC === "0 - 150 CC") return 1249;
+            if (bikeCC === "150 - 250 CC") return 1349;
+            if (bikeCC === "250 - 400 CC") return 2549;
+            if (bikeCC === "400 - 450 CC") return 2599;
+            if (bikeCC === "450 - 650 CC") return 2649;
+            if (bikeCC === "650+ CC") return 2999;
+            return 1249;
           }
           if (serviceType === "Jumpstart") return 450;
           if (serviceType === "Puncture") return 600;

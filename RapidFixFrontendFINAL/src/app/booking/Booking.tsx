@@ -32,6 +32,7 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import { Calendar } from "@/components/ui/calendar-rac";
 import { parseDate, getLocalTimeZone, today } from "@internationalized/date";
+import { MODEL_CC_MAP, CC_CATEGORIES } from "@/lib/bike_cc_categories";
 
 const BIKE_BRANDS = [
   { name: "Hero", logo: "/brandLogos/hero.webp" },
@@ -476,10 +477,13 @@ const BIKE_SERVICES = [
       "Spark Plug Cleaning",
     ],
     prices: {
-      "0 - 150": 799,
-      "150 - 250": 899,
-      "250 - 400": 999,
-      "450 - 650": 1099,
+      "0 - 150 CC": 799,
+      "150 - 250 CC": 899,
+      "250 - 400 CC": 999,
+      "400 - 450 CC": 1049,
+      "450 - 650 CC": 1099,
+      "650+ CC": 1299,
+      "Electric": 799,
     },
     icon: <Wrench className="w-6 h-6" />,
   },
@@ -500,10 +504,13 @@ const BIKE_SERVICES = [
       "Engine Oil Change",
     ],
     prices: {
-      "0 - 150": 1249,
-      "150 - 250": 1349,
-      "250 - 400": 2549,
-      "450 - 650": 2649,
+      "0 - 150 CC": 1249,
+      "150 - 250 CC": 1349,
+      "250 - 400 CC": 2549,
+      "400 - 450 CC": 2599,
+      "450 - 650 CC": 2649,
+      "650+ CC": 2999,
+      "Electric": 1249,
     },
     icon: <Droplets className="w-6 h-6" />,
   },
@@ -667,6 +674,15 @@ export default function Booking() {
       }
     }
   }, [searchParams, setServiceType, vehicleType]);
+
+  useEffect(() => {
+    if (vehicleType === "Bike" && engineType !== "Electric" && model) {
+      const cats = MODEL_CC_MAP[model] ?? CC_CATEGORIES;
+      if (cats.length === 1) {
+        setBikeCC(cats[0]);
+      }
+    }
+  }, [model, vehicleType, engineType, setBikeCC]);
 
   const handleNext = () => setStep(step + 1);
   const handleBack = () => setStep(step - 1);
@@ -995,19 +1011,19 @@ export default function Booking() {
                       <label className="block text-xs font-black uppercase tracking-widest mb-2">
                         Select Engine CC
                       </label>
-                      <div className="grid grid-cols-3 gap-2">
-                        {["0 - 150", "150 - 250", "250 - 400", "450 - 650"].map(
-                          (cc) => (
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                        {CC_CATEGORIES.filter(cat => (MODEL_CC_MAP[model || ""] ?? CC_CATEGORIES).includes(cat)).map(
+                          (cat) => (
                             <button
-                              key={cc}
-                              onClick={() => setBikeCC(cc)}
+                              key={cat}
+                              onClick={() => setBikeCC(cat)}
                               className={`p-2 text-xs font-bold border-2 transition-all ${
-                                bikeCC === cc
+                                bikeCC === cat
                                   ? "bg-[var(--color-primary)] border-[var(--color-primary)] text-white"
                                   : "bg-white border-[var(--color-grey-300)] hover:border-[var(--color-black)]"
                               }`}
                             >
-                              {cc} CC
+                              {cat}
                             </button>
                           ),
                         )}
@@ -1025,8 +1041,9 @@ export default function Booking() {
                       ).map((service, idx) => {
                         const isExpanded = expandedService === service.title;
                         const isSelected = serviceType === service.title;
+                        const priceKey = engineType === "Electric" ? "Electric" : (bikeCC || "0 - 150 CC");
                         const price = (service as any).prices
-                          ? (service as any).prices[bikeCC || "0 - 150"]
+                          ? (service as any).prices[priceKey]
                           : (service as any).price;
 
                         return (

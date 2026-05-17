@@ -1,4 +1,11 @@
 import { LinkCard } from "@/components/ui/link-card"
+import { Metadata } from "next";
+
+
+export const metadata: Metadata = {
+  title: "About Us",      
+  description: "Learn about RapidFix — Delhi NCR's trusted car & bike service center.",
+};
 
 const architectureCards = [
   {

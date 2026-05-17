@@ -26,22 +26,24 @@ export function Footer() {
         <div>
           <h4 className="font-bold mb-4">SERVICES</h4>
           <ul className="space-y-2 text-sm text-[var(--color-grey-300)]">
-            <li>Bike Service</li>
-            <li>Car Service</li>
-            <li>Car AC Repair</li>
-            <li>Battery</li>
-            <li>Tyre & Wheel</li>
-            <li>Engine Repair</li>
-            <li>Denting & Painting</li>
-            <li>EV Service</li>
+            <li><Link href="/booking" className="hover:text-white transition-colors">Bike Service</Link></li>
+            <li><Link href="/booking" className="hover:text-white transition-colors">Car Service</Link></li>
+            <li><Link href="/booking" className="hover:text-white transition-colors">Car AC Repair</Link></li>
+            <li><Link href="/booking" className="hover:text-white transition-colors">Battery</Link></li>
+            <li><Link href="/booking" className="hover:text-white transition-colors">Tyre & Wheel</Link></li>
+            <li><Link href="/booking" className="hover:text-white transition-colors">Engine Repair</Link></li>
+            <li><Link href="/booking" className="hover:text-white transition-colors">Denting & Painting</Link></li>
+            <li><Link href="/booking" className="hover:text-white transition-colors">EV Service</Link></li>
           </ul>
         </div>
         <div>
           <h4 className="font-bold mb-4">CONTACT</h4>
           <ul className="space-y-2 text-sm text-[var(--color-grey-300)]">
             <li>96678 91434</li>
-            <li>support@rapidfix.com</li>
-            <li>Sector 120, Noida, Uttar Pradesh 201301, India</li>
+            <li>rapidfix55@gmail.com</li>
+            <li>
+            <p>HEAD OFFICE :</p>
+              Sector 120, Noida, Uttar Pradesh 201301, India</li>
           </ul>
         </div>
       </div>
