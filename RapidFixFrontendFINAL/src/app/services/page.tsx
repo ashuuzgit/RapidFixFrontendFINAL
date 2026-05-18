@@ -4,37 +4,45 @@ import { Button } from "@antigravity/ui/Button";
 import { ArrowRight, ShieldCheck, Clock, Banknote } from "lucide-react";
 import { BrandsStrip } from "@/components/BrandsStrip";
 import { StatisticsStrip } from "@/components/StatisticsStrip";
-import { formatCity } from "@/lib/utils";
 
-type Props = { params: { city: string } };
+export const metadata: Metadata = {
+  title: "Our Services | Car & Bike Services | RapidFix",
+  description: "Explore a wide range of expert car and bike services at your doorstep with RapidFix.",
+  keywords: ["car service near me","bike service near me","car repair near me","bike repair near me","car wash near me","bike wash near me","engine repair near me","car AC repair near me","battery replacement near me","tyre and wheel near me","denting and painting near me","EV service near me","puncture repair near me","rapidfix","rapidfixauto","automotive repair Delhi","mechanic near me"],
+  alternates: { canonical: "https://rapidfixauto.in/services" },
+};
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const city = formatCity(params?.city || "your-city");
-  return {
-    title: `Mechanic Near Me in ${city} | RapidFix`,
-    description: `Looking for a mechanic near you in ${city}? RapidFix offers doorstep car & bike service, repair, wash, and EV service in ${city}.`,
-    keywords: ["car service near me","bike service near me","car repair near me","bike repair near me","car wash near me","bike wash near me","engine repair near me","car AC repair near me","battery replacement near me","tyre and wheel near me","denting and painting near me","EV service near me","puncture repair near me","rapidfix","rapidfixauto","automotive repair Delhi","mechanic near me"],
-    alternates: { canonical: `https://rapidfixauto.in/mechanic-near-me-in-${params?.city}` },
-  };
-}
-
-export default function MechanicCityPage({ params }: Props) {
-  const cityName = formatCity(params?.city || "your-city");
+export default function ServicesHubPage() {
+  const services = [
+    { title: "Bike Service", link: "/services/bike-service" },
+    { title: "Car Service", link: "/services/car-service" },
+    { title: "Bike Repair", link: "/services/bike-repair" },
+    { title: "Car Repair", link: "/services/car-repair" },
+    { title: "Puncture Repair", link: "/services/puncture-repair" },
+    { title: "Car AC Repair", link: "/services/car-ac-repair" },
+    { title: "Denting & Painting", link: "/services/denting-painting" },
+    { title: "EV Service", link: "/services/ev-service" },
+    { title: "Battery Replacement", link: "/services/battery-replacement" },
+    { title: "Tyre & Wheel", link: "/services/tyre-wheel" },
+  ];
 
   return (
     <div className="w-full flex flex-col bg-white overflow-hidden relative pt-24">
-      <main className="container mx-auto px-8 py-16 max-w-5xl">
-        <h1 className="text-5xl md:text-7xl font-black uppercase tracking-tight leading-none mb-6">
-          Mechanic Near Me in {cityName}
-        </h1>
-        <div className="mt-8 mb-12 text-lg text-black/70 font-medium space-y-6">
-          <p>
-            RapidFix is now operating in {cityName} to provide top-tier <strong>automotive repair Delhi</strong> NCR wide. If you are searching for a reliable <strong>mechanic near me</strong>, you have found the best in class.
-          </p>
-          <p>
-            We offer comprehensive doorstep services including <strong>car service near me</strong>, <strong>bike service near me</strong>, <strong>car AC repair near me</strong>, <strong>denting and painting near me</strong>, and even <strong>EV service near me</strong>. Our certified mechanics bring the garage to your home, guaranteeing absolute precision.
-          </p>
-        </div>
+      <main className="container mx-auto px-8 py-16 max-w-6xl">
+        <h1 className="text-5xl md:text-7xl font-black uppercase tracking-tight leading-none mb-6">Our Services</h1>
+        <p className="text-xl text-black/70 font-medium mb-12 max-w-3xl">
+          Welcome to RapidFixAuto. Whether you need a <strong>car service near me</strong> or a <strong>bike repair near me</strong>, our certified mechanics deliver premium doorstep automotive repair in Delhi NCR. We handle everything from <strong>engine repair near me</strong> to <strong>car AC repair near me</strong>.
+        </p>
+
+        <section className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mb-16">
+          {services.map((service, index) => (
+            <Link key={index} href={service.link} className="block p-8 border-2 border-black hover:bg-[var(--color-grey-100)] transition-colors group relative overflow-hidden">
+               <ArrowRight className="absolute top-8 right-8 text-black opacity-0 group-hover:opacity-100 group-hover:translate-x-2 transition-all" />
+              <h3 className="text-2xl font-black uppercase mb-2">{service.title}</h3>
+              <p className="text-black/60 font-medium uppercase text-sm tracking-wider">Explore Service</p>
+            </Link>
+          ))}
+        </section>
       </main>
 
 

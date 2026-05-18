@@ -4,36 +4,45 @@ import { Button } from "@antigravity/ui/Button";
 import { ArrowRight, ShieldCheck, Clock, Banknote } from "lucide-react";
 import { BrandsStrip } from "@/components/BrandsStrip";
 import { StatisticsStrip } from "@/components/StatisticsStrip";
-import { formatCity } from "@/lib/utils";
 
-type Props = { params: { city: string } };
+export const metadata: Metadata = {
+  title: "RapidFix Locations | Car & Bike Service Areas",
+  description: "Find RapidFix doorstep car and bike service near you.",
+  keywords: ["car service near me","bike service near me","car repair near me","bike repair near me","car wash near me","bike wash near me","engine repair near me","car AC repair near me","battery replacement near me","tyre and wheel near me","denting and painting near me","EV service near me","puncture repair near me","rapidfix","rapidfixauto","automotive repair Delhi","mechanic near me"],
+  alternates: { canonical: "https://rapidfixauto.in/locations" },
+};
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const city = formatCity(params?.city || "your-city");
-  return {
-    title: `Mechanic Near Me in ${city} | RapidFix`,
-    description: `Looking for a mechanic near you in ${city}? RapidFix offers doorstep car & bike service, repair, wash, and EV service in ${city}.`,
-    keywords: ["car service near me","bike service near me","car repair near me","bike repair near me","car wash near me","bike wash near me","engine repair near me","car AC repair near me","battery replacement near me","tyre and wheel near me","denting and painting near me","EV service near me","puncture repair near me","rapidfix","rapidfixauto","automotive repair Delhi","mechanic near me"],
-    alternates: { canonical: `https://rapidfixauto.in/mechanic-near-me-in-${params?.city}` },
-  };
-}
-
-export default function MechanicCityPage({ params }: Props) {
-  const cityName = formatCity(params?.city || "your-city");
+export default function LocationsHubPage() {
+  const cities = ['delhi', 'noida', 'gurgaon', 'faridabad', 'ghaziabad', 'greater-noida', 'dwarka', 'chennai', 'kolkata', 'bangalore', 'mumbai', 'pune', 'hyderabad', 'lucknow'];
 
   return (
     <div className="w-full flex flex-col bg-white overflow-hidden relative pt-24">
-      <main className="container mx-auto px-8 py-16 max-w-5xl">
-        <h1 className="text-5xl md:text-7xl font-black uppercase tracking-tight leading-none mb-6">
-          Mechanic Near Me in {cityName}
-        </h1>
-        <div className="mt-8 mb-12 text-lg text-black/70 font-medium space-y-6">
-          <p>
-            RapidFix is now operating in {cityName} to provide top-tier <strong>automotive repair Delhi</strong> NCR wide. If you are searching for a reliable <strong>mechanic near me</strong>, you have found the best in class.
-          </p>
-          <p>
-            We offer comprehensive doorstep services including <strong>car service near me</strong>, <strong>bike service near me</strong>, <strong>car AC repair near me</strong>, <strong>denting and painting near me</strong>, and even <strong>EV service near me</strong>. Our certified mechanics bring the garage to your home, guaranteeing absolute precision.
-          </p>
+      <main className="container mx-auto px-8 py-16 max-w-6xl">
+        <h1 className="text-5xl md:text-7xl font-black uppercase tracking-tight leading-none mb-6">Service Areas</h1>
+        <p className="text-xl text-black/70 font-medium mb-12 max-w-3xl">
+          RapidFix provides professional <strong>automotive repair Delhi</strong> NCR wide and beyond. When you need a <strong>mechanic near me</strong>, a <strong>car repair near me</strong>, or a <strong>bike service near me</strong>, we are available in the following locations.
+        </p>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+          {cities.map(city => {
+            const formattedCity = city.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+            return (
+              <div key={city} className="p-8 border-2 border-black hover:bg-[var(--color-grey-100)] transition-colors group relative">
+                <h2 className="text-2xl font-black uppercase mb-6">{formattedCity}</h2>
+                <div className="flex flex-col gap-3 font-medium uppercase text-sm tracking-widest text-black/70">
+                  <Link href={`/mechanic-near-me-in-${city}`} className="hover:text-black hover:underline flex items-center">
+                    <ArrowRight className="w-4 h-4 mr-2" /> Mechanic Near Me
+                  </Link>
+                  <Link href={`/bike-service-in-${city}`} className="hover:text-black hover:underline flex items-center">
+                    <ArrowRight className="w-4 h-4 mr-2" /> Bike Service
+                  </Link>
+                  <Link href={`/car-service-in-${city}`} className="hover:text-black hover:underline flex items-center">
+                    <ArrowRight className="w-4 h-4 mr-2" /> Car Service
+                  </Link>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </main>
 

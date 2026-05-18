@@ -8,6 +8,8 @@ import { Textarea } from "@antigravity/ui/Textarea"
 import { submitContact } from "@/app/actions/contact"
 import { MapPin, Mail, Phone, Loader2 } from "lucide-react"
 
+
+
 type ContactFormData = {
   name: string;
   email: string;
